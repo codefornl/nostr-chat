@@ -13,18 +13,9 @@
     #input button { padding: 1rem; border: none; background: #333; color: white; }
     .message { margin-bottom: 0.5rem; }
   </style>
-</head>
-<body>
-  <div id="channels"></div>
-  <div id="chat">
-    <div id="messages"></div>
-    <div id="input">
-      <input type="text" id="text" placeholder="Type your message...">
-      <button onclick="sendMessage()">Send</button>
-    </div>
-  </div>
+  <script type="module">
+    import { generatePrivateKey, getPublicKey, getEventHash, signEvent } from 'https://esm.sh/nostr-tools';
 
-  <script>
     const relay = new WebSocket("wss://relay.damus.io");
 
     const channels = [
@@ -34,8 +25,17 @@
     ];
 
     let activeChannel = channels[0];
-    let privkey = "demo-private-key"; // vervang dit later
-    let pubkey = "demo-pubkey";
+
+    // Load or generate keypair
+    let privkey = localStorage.getItem("nostr_privkey");
+    let pubkey = localStorage.getItem("nostr_pubkey");
+
+    if (!privkey || !pubkey) {
+      privkey = generatePrivateKey();
+      pubkey = getPublicKey(privkey);
+      localStorage.setItem("nostr_privkey", privkey);
+      localStorage.setItem("nostr_pubkey", pubkey);
+    }
 
     const channelsDiv = document.getElementById("channels");
     const messagesDiv = document.getElementById("messages");
@@ -51,12 +51,15 @@
 
     function switchChannel(channel) {
       activeChannel = channel;
-      messagesDiv.innerHTML = "<em>Loading...</em>";
+      messagesDiv.innerHTML = "";
+      const loadingMsg = document.createElement("em");
+      loadingMsg.textContent = "Loading...";
+      messagesDiv.appendChild(loadingMsg);
       const sub = ["REQ", "sub-" + channel.id, { kinds: [1], "#t": [channel.tag], limit: 50 }];
       relay.send(JSON.stringify(sub));
     }
 
-    function sendMessage() {
+    window.sendMessage = async function () {
       const input = document.getElementById("text");
       const content = input.value;
       if (!content) return;
@@ -66,10 +69,10 @@
         created_at: Math.floor(Date.now() / 1000),
         tags: [["t", activeChannel.tag]],
         content: content,
-        pubkey: pubkey,
-        id: Math.random().toString(36).substr(2), // dummy id
-        sig: "dummy-sig"
+        pubkey: pubkey
       };
+      event.id = getEventHash(event);
+      event.sig = signEvent(event, privkey);
       relay.send(JSON.stringify(["EVENT", event]));
       input.value = "";
     }
@@ -78,6 +81,8 @@
       const data = JSON.parse(event.data);
       if (data[0] === "EVENT") {
         const ev = data[2];
+        const loading = messagesDiv.querySelector("em");
+        if (loading) loading.remove();
         const msg = document.createElement("div");
         msg.className = "message";
         msg.textContent = ev.content;
@@ -90,5 +95,15 @@
       switchChannel(activeChannel);
     };
   </script>
+</head>
+<body>
+  <div id="channels"></div>
+  <div id="chat">
+    <div id="messages"></div>
+    <div id="input">
+      <input type="text" id="text" placeholder="Type your message...">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
 </body>
 </html>
