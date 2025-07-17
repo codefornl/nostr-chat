@@ -13,88 +13,6 @@
     #input button { padding: 1rem; border: none; background: #333; color: white; }
     .message { margin-bottom: 0.5rem; }
   </style>
-  <script type="module">
-    import { generatePrivateKey, getPublicKey, getEventHash, signEvent } from 'https://esm.sh/nostr-tools';
-
-    const relay = new WebSocket("wss://relay.damus.io");
-
-    const channels = [
-      { id: "general", label: "General", tag: "chat-general" },
-      { id: "random", label: "Random", tag: "chat-random" },
-      { id: "tech", label: "Tech", tag: "chat-tech" }
-    ];
-
-    let activeChannel = channels[0];
-
-    // Load or generate keypair
-    let privkey = localStorage.getItem("nostr_privkey");
-    let pubkey = localStorage.getItem("nostr_pubkey");
-
-    if (!privkey || !pubkey) {
-      privkey = generatePrivateKey();
-      pubkey = getPublicKey(privkey);
-      localStorage.setItem("nostr_privkey", privkey);
-      localStorage.setItem("nostr_pubkey", pubkey);
-    }
-
-    const channelsDiv = document.getElementById("channels");
-    const messagesDiv = document.getElementById("messages");
-
-    channels.forEach(chan => {
-      const btn = document.createElement("button");
-      btn.textContent = chan.label;
-      btn.onclick = () => switchChannel(chan);
-      btn.style.display = "block";
-      btn.style.marginBottom = "0.5rem";
-      channelsDiv.appendChild(btn);
-    });
-
-    function switchChannel(channel) {
-      activeChannel = channel;
-      messagesDiv.innerHTML = "";
-      const loadingMsg = document.createElement("em");
-      loadingMsg.textContent = "Loading...";
-      messagesDiv.appendChild(loadingMsg);
-      const sub = ["REQ", "sub-" + channel.id, { kinds: [1], "#t": [channel.tag], limit: 50 }];
-      relay.send(JSON.stringify(sub));
-    }
-
-    window.sendMessage = async function () {
-      const input = document.getElementById("text");
-      const content = input.value;
-      if (!content) return;
-
-      const event = {
-        kind: 1,
-        created_at: Math.floor(Date.now() / 1000),
-        tags: [["t", activeChannel.tag]],
-        content: content,
-        pubkey: pubkey
-      };
-      event.id = getEventHash(event);
-      event.sig = signEvent(event, privkey);
-      relay.send(JSON.stringify(["EVENT", event]));
-      input.value = "";
-    }
-
-    relay.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data[0] === "EVENT") {
-        const ev = data[2];
-        const loading = messagesDiv.querySelector("em");
-        if (loading) loading.remove();
-        const msg = document.createElement("div");
-        msg.className = "message";
-        msg.textContent = ev.content;
-        messagesDiv.appendChild(msg);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      }
-    };
-
-    relay.onopen = () => {
-      switchChannel(activeChannel);
-    };
-  </script>
 </head>
 <body>
   <div id="channels"></div>
@@ -105,5 +23,90 @@
       <button onclick="sendMessage()">Send</button>
     </div>
   </div>
+
+  <script type="module">
+    import { generatePrivateKey, getPublicKey, getEventHash, signEvent } from 'https://esm.sh/nostr-tools';
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const relay = new WebSocket("wss://relay.damus.io");
+
+      const channels = [
+        { id: "general", label: "General", tag: "chat-general" },
+        { id: "random", label: "Random", tag: "chat-random" },
+        { id: "tech", label: "Tech", tag: "chat-tech" }
+      ];
+
+      let activeChannel = channels[0];
+
+      // Load or generate keypair
+      let privkey = localStorage.getItem("nostr_privkey");
+      let pubkey = localStorage.getItem("nostr_pubkey");
+
+      if (!privkey || !pubkey) {
+        privkey = generatePrivateKey();
+        pubkey = getPublicKey(privkey);
+        localStorage.setItem("nostr_privkey", privkey);
+        localStorage.setItem("nostr_pubkey", pubkey);
+      }
+
+      const channelsDiv = document.getElementById("channels");
+      const messagesDiv = document.getElementById("messages");
+
+      channels.forEach(chan => {
+        const btn = document.createElement("button");
+        btn.textContent = chan.label;
+        btn.onclick = () => switchChannel(chan);
+        btn.style.display = "block";
+        btn.style.marginBottom = "0.5rem";
+        channelsDiv.appendChild(btn);
+      });
+
+      function switchChannel(channel) {
+        activeChannel = channel;
+        messagesDiv.innerHTML = "";
+        const loadingMsg = document.createElement("em");
+        loadingMsg.textContent = "Loading...";
+        messagesDiv.appendChild(loadingMsg);
+        const sub = ["REQ", "sub-" + channel.id, { kinds: [1], "#t": [channel.tag], limit: 50 }];
+        relay.send(JSON.stringify(sub));
+      }
+
+      window.sendMessage = async function () {
+        const input = document.getElementById("text");
+        const content = input.value;
+        if (!content) return;
+
+        const event = {
+          kind: 1,
+          created_at: Math.floor(Date.now() / 1000),
+          tags: [["t", activeChannel.tag]],
+          content: content,
+          pubkey: pubkey
+        };
+        event.id = getEventHash(event);
+        event.sig = signEvent(event, privkey);
+        relay.send(JSON.stringify(["EVENT", event]));
+        input.value = "";
+      }
+
+      relay.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data[0] === "EVENT") {
+          const ev = data[2];
+          const loading = messagesDiv.querySelector("em");
+          if (loading) loading.remove();
+          const msg = document.createElement("div");
+          msg.className = "message";
+          msg.textContent = ev.content;
+          messagesDiv.appendChild(msg);
+          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+      };
+
+      relay.onopen = () => {
+        switchChannel(activeChannel);
+      };
+    });
+  </script>
 </body>
 </html>
