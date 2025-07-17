@@ -7,6 +7,7 @@
     body { margin: 0; font-family: sans-serif; display: flex; height: 100vh; }
     #channels { width: 200px; background: #eee; padding: 1rem; overflow-y: auto; }
     #chat { flex: 1; display: flex; flex-direction: column; }
+    #header { padding: 1rem; background: #ddd; font-weight: bold; }
     #messages { flex: 1; padding: 1rem; overflow-y: auto; background: #fafafa; }
     #input { display: flex; border-top: 1px solid #ccc; }
     #input input { flex: 1; padding: 1rem; border: none; }
@@ -17,6 +18,7 @@
 <body>
   <div id="channels"></div>
   <div id="chat">
+    <div id="header">#general</div>
     <div id="messages"></div>
     <div id="input">
       <input type="text" id="text" placeholder="Type your message...">
@@ -31,6 +33,10 @@
     function getRandomPrivkeyHex() {
       const bytes = crypto.getRandomValues(new Uint8Array(32));
       return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function getRandomAnonName() {
+      return "anon" + Math.floor(10000 + Math.random() * 90000);
     }
 
     async function signEvent(event, privkeyHex) {
@@ -62,12 +68,20 @@
         localStorage.setItem("nostr_pubkey", pubkey);
       }
 
+      // Load or prompt for username
+      let username = localStorage.getItem("nostr_username");
+      if (!username) {
+        username = prompt("Enter your name (or leave blank for anonymous):") || getRandomAnonName();
+        localStorage.setItem("nostr_username", username);
+      }
+
       const channelsDiv = document.getElementById("channels");
       const messagesDiv = document.getElementById("messages");
+      const headerDiv = document.getElementById("header");
 
       channels.forEach(chan => {
         const btn = document.createElement("button");
-        btn.textContent = chan.label;
+        btn.textContent = "#" + chan.label;
         btn.onclick = () => switchChannel(chan);
         btn.style.display = "block";
         btn.style.marginBottom = "0.5rem";
@@ -76,6 +90,7 @@
 
       function switchChannel(channel) {
         activeChannel = channel;
+        headerDiv.textContent = "#" + channel.label;
         messagesDiv.innerHTML = "";
         const loadingMsg = document.createElement("em");
         loadingMsg.textContent = "Loading...";
@@ -93,7 +108,7 @@
           kind: 1,
           created_at: Math.floor(Date.now() / 1000),
           tags: [["t", activeChannel.tag]],
-          content: content,
+          content: username + ": " + content,
           pubkey: pubkey
         };
         event.id = getEventHash(event);
