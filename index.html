@@ -25,7 +25,14 @@
   </div>
 
   <script type="module">
-    import { generatePrivateKey, getPublicKey, getEventHash, signEvent } from 'https://esm.sh/nostr-tools';
+    import { generatePrivateKey, getPublicKey, getEventHash, utils as nostrUtils } from 'https://esm.sh/nostr-tools';
+    import { schnorr } from 'https://esm.sh/@noble/curves/secp256k1';
+
+    async function signEvent(event, privkey) {
+      const hash = getEventHash(event);
+      const sig = await schnorr.sign(hash, privkey);
+      return nostrUtils.bytesToHex(sig);
+    }
 
     window.addEventListener('DOMContentLoaded', () => {
       const relay = new WebSocket("wss://relay.damus.io");
@@ -84,7 +91,7 @@
           pubkey: pubkey
         };
         event.id = getEventHash(event);
-        event.sig = signEvent(event, privkey);
+        event.sig = await signEvent(event, privkey);
         relay.send(JSON.stringify(["EVENT", event]));
         input.value = "";
       }
