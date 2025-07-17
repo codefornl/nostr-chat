@@ -49,11 +49,8 @@
     window.addEventListener('DOMContentLoaded', () => {
       const relay = new WebSocket("wss://relay.damus.io");
 
-      const channels = [
-        { id: "general", label: "General", tag: "chat-general" },
-        { id: "random", label: "Random", tag: "chat-random" },
-        { id: "tech", label: "Tech", tag: "chat-tech" }
-      ];
+      // channels will be loaded from channels.json
+      let channels = [];
 
       let activeChannel = channels[0];
       let messageBuffer = [];
@@ -89,14 +86,17 @@
         }
       });
 
-      channels.forEach(chan => {
-        const btn = document.createElement("button");
-        btn.textContent = "#" + chan.label;
-        btn.onclick = () => switchChannel(chan);
-        btn.style.display = "block";
-        btn.style.marginBottom = "0.5rem";
-        channelsDiv.appendChild(btn);
-      });
+      function renderChannels() {
+        channelsDiv.innerHTML = "";
+        channels.forEach(chan => {
+          const btn = document.createElement("button");
+          btn.textContent = "#" + chan.label;
+          btn.onclick = () => switchChannel(chan);
+          btn.style.display = "block";
+          btn.style.marginBottom = "0.5rem";
+          channelsDiv.appendChild(btn);
+        });
+      }
 
       function renderMessages() {
         messagesDiv.innerHTML = "";
@@ -151,7 +151,18 @@
       };
 
       relay.onopen = () => {
-        switchChannel(activeChannel);
+        fetch('channels.json')
+          .then(res => res.json())
+          .then(data => {
+            channels = data;
+            activeChannel = channels[0];
+            renderChannels();
+            switchChannel(activeChannel);
+          })
+          .catch(err => {
+            console.error("Failed to load channels.json", err);
+            messagesDiv.innerHTML = '<p style="color:red">Failed to load channels.json</p>';
+          });
       };
     });
   </script>
