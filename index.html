@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NOSTR Chat</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; display: flex; height: 100vh; }
+    #channels { width: 200px; background: #eee; padding: 1rem; overflow-y: auto; }
+    #chat { flex: 1; display: flex; flex-direction: column; }
+    #messages { flex: 1; padding: 1rem; overflow-y: auto; background: #fafafa; }
+    #input { display: flex; border-top: 1px solid #ccc; }
+    #input input { flex: 1; padding: 1rem; border: none; }
+    #input button { padding: 1rem; border: none; background: #333; color: white; }
+    .message { margin-bottom: 0.5rem; }
+  </style>
+</head>
+<body>
+  <div id="channels"></div>
+  <div id="chat">
+    <div id="messages"></div>
+    <div id="input">
+      <input type="text" id="text" placeholder="Type your message...">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const relay = new WebSocket("wss://relay.damus.io");
+
+    const channels = [
+      { id: "general", label: "General", tag: "chat-general" },
+      { id: "random", label: "Random", tag: "chat-random" },
+      { id: "tech", label: "Tech", tag: "chat-tech" }
+    ];
+
+    let activeChannel = channels[0];
+    let privkey = "demo-private-key"; // vervang dit later
+    let pubkey = "demo-pubkey";
+
+    const channelsDiv = document.getElementById("channels");
+    const messagesDiv = document.getElementById("messages");
+
+    channels.forEach(chan => {
+      const btn = document.createElement("button");
+      btn.textContent = chan.label;
+      btn.onclick = () => switchChannel(chan);
+      btn.style.display = "block";
+      btn.style.marginBottom = "0.5rem";
+      channelsDiv.appendChild(btn);
+    });
+
+    function switchChannel(channel) {
+      activeChannel = channel;
+      messagesDiv.innerHTML = "<em>Loading...</em>";
+      const sub = ["REQ", "sub-" + channel.id, { kinds: [1], "#t": [channel.tag], limit: 50 }];
+      relay.send(JSON.stringify(sub));
+    }
+
+    function sendMessage() {
+      const input = document.getElementById("text");
+      const content = input.value;
+      if (!content) return;
+
+      const event = {
+        kind: 1,
+        created_at: Math.floor(Date.now() / 1000),
+        tags: [["t", activeChannel.tag]],
+        content: content,
+        pubkey: pubkey,
+        id: Math.random().toString(36).substr(2), // dummy id
+        sig: "dummy-sig"
+      };
+      relay.send(JSON.stringify(["EVENT", event]));
+      input.value = "";
+    }
+
+    relay.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data[0] === "EVENT") {
+        const ev = data[2];
+        const msg = document.createElement("div");
+        msg.className = "message";
+        msg.textContent = ev.content;
+        messagesDiv.appendChild(msg);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+    };
+
+    relay.onopen = () => {
+      switchChannel(activeChannel);
+    };
+  </script>
+</body>
+</html>
