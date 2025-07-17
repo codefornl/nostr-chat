@@ -2,5 +2,5 @@
   { "id": "algemeen", "label": "Algemeen", "tag": "chat-algemeen" },
   { "id": "random", "label": "Random", "tag": "chat-random" },
   { "id": "polisnl", "label": "PolisNL", "tag": "chat-polisnl" },
-  { "id": "standaardvoorpubliekecode", "label": "Standaard voor Publieke Code", "tag": "chat-standaardvoorpubliekecode" },
+  { "id": "standaardvoorpubliekecode", "label": "Standaard voor Publieke Code", "tag": "chat-standaardvoorpubliekecode" }
 ]
