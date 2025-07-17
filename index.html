@@ -25,8 +25,8 @@
   </div>
 
   <script type="module">
-    import { generatePrivateKey, getPublicKey, getEventHash, utils as nostrUtils } from 'https://esm.sh/nostr-tools';
-    import { schnorr } from 'https://esm.sh/@noble/curves/secp256k1';
+    import { getPublicKey, getEventHash, utils as nostrUtils } from 'https://esm.sh/nostr-tools';
+    import { schnorr, utils as secpUtils } from 'https://esm.sh/@noble/curves/secp256k1';
 
     async function signEvent(event, privkey) {
       const hash = getEventHash(event);
@@ -50,7 +50,8 @@
       let pubkey = localStorage.getItem("nostr_pubkey");
 
       if (!privkey || !pubkey) {
-        privkey = generatePrivateKey();
+        const privkeyBytes = secpUtils.randomPrivateKey();
+        privkey = nostrUtils.bytesToHex(privkeyBytes);
         pubkey = getPublicKey(privkey);
         localStorage.setItem("nostr_privkey", privkey);
         localStorage.setItem("nostr_pubkey", pubkey);
