@@ -56,6 +56,7 @@
       ];
 
       let activeChannel = channels[0];
+      let messageBuffer = [];
 
       // Load or generate keypair
       let privkey = localStorage.getItem("nostr_privkey");
@@ -88,6 +89,18 @@
         channelsDiv.appendChild(btn);
       });
 
+      function renderMessages() {
+        messagesDiv.innerHTML = "";
+        messageBuffer.sort((a, b) => a.created_at - b.created_at);
+        messageBuffer.forEach(ev => {
+          const msg = document.createElement("div");
+          msg.className = "message";
+          msg.textContent = ev.content;
+          messagesDiv.appendChild(msg);
+        });
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+
       function switchChannel(channel) {
         activeChannel = channel;
         headerDiv.textContent = "#" + channel.label;
@@ -95,6 +108,7 @@
         const loadingMsg = document.createElement("em");
         loadingMsg.textContent = "Loading...";
         messagesDiv.appendChild(loadingMsg);
+        messageBuffer = [];
         const sub = ["REQ", "sub-" + channel.id, { kinds: [1], "#t": [channel.tag], limit: 50 }];
         relay.send(JSON.stringify(sub));
       }
@@ -123,11 +137,8 @@
           const ev = data[2];
           const loading = messagesDiv.querySelector("em");
           if (loading) loading.remove();
-          const msg = document.createElement("div");
-          msg.className = "message";
-          msg.textContent = ev.content;
-          messagesDiv.appendChild(msg);
-          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+          messageBuffer.push(ev);
+          renderMessages();
         }
       };
 
