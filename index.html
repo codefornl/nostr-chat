@@ -131,7 +131,10 @@
         channels.forEach(chan => {
           const btn = document.createElement("button");
           btn.textContent = "#" + chan.label;
-          btn.onclick = () => switchChannel(chan);
+          btn.onclick = () => {
+            switchChannel(chan);
+            document.getElementById('channels').classList.remove('show');
+          };
           btn.style.display = "block";
           btn.style.marginBottom = "0.5rem";
           channelsDiv.appendChild(btn);
