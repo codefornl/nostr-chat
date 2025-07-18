@@ -15,14 +15,15 @@
     #input input { flex: 1; padding: 1rem; border: none; font-size: 1rem; }
     #input button { padding: 1rem; border: none; background: #333; color: white; font-size: 1rem; }
     .message { margin-bottom: 0.5rem; }
+    .channel-button { display: block; border: none; text-align: left; margin-bottom: 1em }
+    button { cursor: pointer }
 
     @media (max-width: 600px) {
       body { flex-direction: column; }
       #channels { display: none; }
       #chat { width: 100vw; height: 100vh; }
     }
-  </style>
-  <style>
+
     #toggleMenu {
       display: none;
       position: absolute;
@@ -58,11 +59,11 @@
   <button id="toggleMenu" onclick="document.getElementById('channels').classList.toggle('show')">☰ Menu</button>
   <div id="channels"></div>
   <div id="chat">
-    <div id="header">#general</div>
+    <div id="header">Code for NL <span id="channelName"></span></div>
     <div id="messages"></div>
     <div id="input">
-      <input type="text" id="text" placeholder="Type your message...">
-      <button onclick="sendMessage()">Send</button>
+      <input type="text" id="text" placeholder="Schrijf je bericht...">
+      <button onclick="sendMessage()">POST</button>
     </div>
   </div>
 
@@ -121,7 +122,7 @@
 
       const channelsDiv = document.getElementById("channels");
       const messagesDiv = document.getElementById("messages");
-      const headerDiv = document.getElementById("header");
+      const channelNameDiv = document.getElementById("channelName");
       const inputField = document.getElementById("text");
 
       inputField.focus();
@@ -137,12 +138,11 @@
         channels.forEach(chan => {
           const btn = document.createElement("button");
           btn.textContent = "#" + chan.label;
+          btn.className = "channel-button";
           btn.onclick = () => {
             switchChannel(chan);
             document.getElementById('channels').classList.remove('show');
           };
-          btn.style.display = "block";
-          btn.style.marginBottom = "0.5rem";
           channelsDiv.appendChild(btn);
         });
       }
@@ -161,7 +161,7 @@
 
       function switchChannel(channel) {
         activeChannel = channel;
-        headerDiv.textContent = "#" + channel.label;
+        channelNameDiv.textContent = "#" + channel.label;
         messagesDiv.innerHTML = "";
         const loadingMsg = document.createElement("em");
         loadingMsg.textContent = "Loading...";
