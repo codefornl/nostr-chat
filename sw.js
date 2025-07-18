@@ -1,7 +1,3 @@
-self.addEventListener('install', e => {
-  self.skipWaiting();
-});
-
-self.addEventListener('fetch', event => {
-  // Laat alles gewoon door (geen caching nodig)
-});
+// sw.js
+self.addEventListener('install', e => self.skipWaiting());
+self.addEventListener('activate', e => self.clients.claim());

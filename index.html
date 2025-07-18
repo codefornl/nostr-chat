@@ -96,7 +96,21 @@
           messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
       });
-      const relay = new WebSocket("wss://relay.damus.io");
+      //const relay = new WebSocket("wss://relay.damus.io");
+      const relay = new WebSocket("wss://nos.lol");
+
+      relay.onopen = () => {
+        console.log("✅ Verbonden met Nostr relay");
+        // bestaande fetch en kanaal-setup hier...
+      };
+
+      relay.onerror = (e) => {
+        console.error("❌ WebSocket fout:", e);
+      };
+
+      relay.onclose = (e) => {
+        console.warn("⚠️ Verbinding gesloten:", e);
+      };
 
       // channels will be loaded from channels.json
       let channels = [];
