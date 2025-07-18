@@ -96,8 +96,9 @@
           messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
       });
-      //const relay = new WebSocket("wss://relay.damus.io");
-      const relay = new WebSocket("wss://nos.lol");
+      
+      const relay = new WebSocket("wss://relay.damus.io");
+      //const relay = new WebSocket("wss://nos.lol");
 
       relay.onopen = () => {
         console.log("✅ Verbonden met Nostr relay");
