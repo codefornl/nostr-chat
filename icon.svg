@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.1 (9c6d41e4, 2022-07-14)"
+   sodipodi:docname="cfnl-icon.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.2102413"
+     inkscape:cx="-406.67556"
+     inkscape:cy="563.63806"
+     inkscape:window-width="1440"
+     inkscape:window-height="847"
+     inkscape:window-x="1519"
+     inkscape:window-y="115"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g4263"
+       inkscape:export-filename="cfnl-icon-512.png"
+       inkscape:export-xdpi="67.73333"
+       inkscape:export-ydpi="67.73333">
+      <rect
+         style="fill:#72b896;stroke-width:0.499999;fill-opacity:1"
+         id="rect234"
+         width="192"
+         height="192"
+         x="39.012711"
+         y="65.440674"
+         rx="20"
+         ry="20" />
+      <path
+         style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:15;stroke-dasharray:none;stroke-opacity:1"
+         d="M 110.74577,98.161022 62.923728,145.98305 118.29661,186.25424"
+         id="path3979" />
+      <path
+         style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:15;stroke-dasharray:none;stroke-opacity:1"
+         d="m 193.54253,111.17499 -61.14019,43.18814"
+         id="path3981" />
+      <text
+         xml:space="preserve"
+         style="font-weight:bold;font-size:40.2246px;font-family:'Atkinson Hyperlegible';-inkscape-font-specification:'Atkinson Hyperlegible Bold';text-align:end;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2.85057;stroke-dasharray:none;stroke-opacity:1"
+         x="188.45851"
+         y="144.10228"
+         id="text4145"
+         transform="matrix(0.59937947,-0.06424928,0.11398198,1.6561741,0,0)"><tspan
+           sodipodi:role="line"
+           id="tspan4143"
+           style="font-size:40.2246px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2.85057;stroke-dasharray:none;stroke-opacity:1"
+           x="188.45851"
+           y="144.10228">CHAT</tspan></text>
+      <path
+         style="fill:none;fill-opacity:1;stroke:#ff5900;stroke-width:5.95378;stroke-dasharray:none;stroke-opacity:1"
+         d="m 196.12174,166.01972 -57.4893,1.45632"
+         id="path4250" />
+      <path
+         style="fill:none;fill-opacity:1;stroke:#ff5900;stroke-width:5.95378;stroke-dasharray:none;stroke-opacity:1"
+         d="M 189.89889,208.5806 137.30445,185.32194"
+         id="path4252" />
+      <text
+         xml:space="preserve"
+         style="font-weight:bold;font-size:25.4px;font-family:'Atkinson Hyperlegible';-inkscape-font-specification:'Atkinson Hyperlegible Bold';text-align:end;text-anchor:end;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:1;stroke-dasharray:none;stroke-opacity:1"
+         x="207.64832"
+         y="222.75"
+         id="text4201"><tspan
+           sodipodi:role="line"
+           id="tspan4199"
+           style="font-size:25.4px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1"
+           x="207.64832"
+           y="222.75">for NL</tspan></text>
+    </g>
+  </g>
+</svg>
