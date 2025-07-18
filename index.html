@@ -96,7 +96,7 @@
           messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
       });
-      
+
       const relay = new WebSocket("wss://relay.damus.io");
       //const relay = new WebSocket("wss://nos.lol");
 
@@ -231,12 +231,6 @@
           });
       };
     });
-
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(err => {
-        console.error('Service Worker registration failed:', err);
-      });
-    }
   </script>
 </body>
 </html>

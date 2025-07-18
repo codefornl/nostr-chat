@@ -1,6 +1,6 @@
 {
-  "name": "NOSTR Chat",
-  "short_name": "Chat",
+  "name": "Code for NL Chat",
+  "short_name": "Code for NL",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#fafafa",
