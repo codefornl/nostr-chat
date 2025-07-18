@@ -87,6 +87,12 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
+      window.addEventListener('resize', () => {
+        const messagesDiv = document.getElementById("messages");
+        if (messagesDiv) {
+          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+      });
       const relay = new WebSocket("wss://relay.damus.io");
 
       // channels will be loaded from channels.json
