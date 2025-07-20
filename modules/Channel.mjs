@@ -1,4 +1,5 @@
 import createNostrEvent from './createNostrEvent.mjs';
+import CodeForNLID from './CodeForNLID.mjs';
 
 export default function Channel(options) {
     const _id = options.id || 'unnamed';
@@ -88,7 +89,6 @@ export default function Channel(options) {
     function registerRelay(relay) {
         relay.subscribe(_tag, eventHandler);
         _relays.push(relay);
-        console.log(`Relay registered: ${relay.getURL()}`);
     }
 
     function eventHandler(event) {
@@ -151,6 +151,13 @@ export default function Channel(options) {
             }
         }
         
+        // Create avatar
+        const avatarEl = document.createElement('img');
+        avatarEl.className = 'message-avatar';
+        avatarEl.src = CodeForNLID.getAvatarDataURL(event.pubkey, 32);
+        avatarEl.alt = `Avatar voor ${username}`;
+        avatarEl.title = `Avatar voor ${username}`;
+        
         const headerEl = document.createElement('div');
         headerEl.className = 'message-header';
         
@@ -170,12 +177,18 @@ export default function Channel(options) {
         headerEl.appendChild(usernameEl);
         headerEl.appendChild(timeEl);
         
+        const messageBodyEl = document.createElement('div');
+        messageBodyEl.className = 'message-body';
+        
         const contentEl = document.createElement('div');
         contentEl.className = 'message-content';
         contentEl.textContent = event.content;
         
-        messageEl.appendChild(headerEl);
-        messageEl.appendChild(contentEl);
+        messageBodyEl.appendChild(headerEl);
+        messageBodyEl.appendChild(contentEl);
+        
+        messageEl.appendChild(avatarEl);
+        messageEl.appendChild(messageBodyEl);
         _messagesEl.appendChild(messageEl);
     }
 

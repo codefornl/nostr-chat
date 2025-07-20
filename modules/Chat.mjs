@@ -1,22 +1,15 @@
 import Channel from './Channel.mjs';
 import Relay from './Relay.mjs';
+import CodeForNLID from './CodeForNLID.mjs';
 
 export default function Chat(rootEl) {
     const _channels = [];
     const _relays = [];
     let _currentChannel = null;
     
-    // Ensure user has a username on startup
-    let username = localStorage.getItem('nostr_username');
-    if (!username) {
-        username = prompt('Wat is je gebruikersnaam voor de chat?');
-        if (username && username.trim()) {
-            username = username.trim();
-            localStorage.setItem('nostr_username', username);
-        } else {
-            username = 'Anoniem';
-            localStorage.setItem('nostr_username', username);
-        }
+    // Initialize anonymous user if needed
+    if (!CodeForNLID.getCurrentUsername()) {
+        CodeForNLID.setAnonymous();
     }
     
 
@@ -61,22 +54,105 @@ export default function Chat(rootEl) {
     userStatusEl.className = 'user-status';
     
     function updateUserStatus() {
-        const currentUsername = localStorage.getItem('nostr_username') || 'Niet ingelogd';
-        userStatusEl.innerHTML = `
-            <h3>Ingelogd als</h3>
-            <div class="current-user">${currentUsername}</div>
-            <button class="logout-btn">Uitloggen</button>
-        `;
+        const currentUsername = CodeForNLID.getCurrentUsername();
+        const isAnonymous = !CodeForNLID.isLoggedIn();
         
+        if (isAnonymous) {
+            userStatusEl.innerHTML = `
+                <h3>Niet ingelogd</h3>
+                <div class="current-user">${currentUsername}</div>
+                <div class="user-actions">
+                    <button class="import-key-btn">Code for NL ID inladen</button>
+                    <button class="new-account-btn">Code for NL ID aanmaken</button>
+                </div>
+            `;
+        } else {
+            const pubkey = CodeForNLID.getPublicKey();
+            const avatarDataURL = pubkey ? CodeForNLID.getAvatarDataURL(pubkey, 48) : '';
+            const needsBackup = CodeForNLID.needsBackup();
+            
+            userStatusEl.innerHTML = `
+                <h3>Ingelogd als</h3>
+                <div class="current-user">
+                    ${avatarDataURL ? `<img src="${avatarDataURL}" alt="Avatar" class="user-avatar" />` : ''}
+                    <span class="username">${currentUsername}</span>
+                </div>
+                <div class="user-actions">
+                    ${needsBackup ? '<button class="download-key-btn">🔑 Key downloaden</button>' : ''}
+                    <button class="logout-btn">Uitloggen</button>
+                </div>
+            `;
+        }
+        
+        const downloadKeyBtn = userStatusEl.querySelector('.download-key-btn');
         const logoutBtn = userStatusEl.querySelector('.logout-btn');
-        logoutBtn.addEventListener('click', () => {
-            if (confirm('Weet je zeker dat je wilt uitloggen? Je verliest je chat identiteit.')) {
-                localStorage.removeItem('nostr_username');
-                localStorage.removeItem('nostr_privkey');
-                localStorage.removeItem('nostr_pubkey');
-                location.reload();
-            }
-        });
+        const importKeyBtn = userStatusEl.querySelector('.import-key-btn');
+        const newAccountBtn = userStatusEl.querySelector('.new-account-btn');
+        
+        if (downloadKeyBtn) {
+            downloadKeyBtn.addEventListener('click', () => {
+                try {
+                    CodeForNLID.downloadBackupImage(`nostr-backup-${currentUsername}.png`);
+                } catch (error) {
+                    alert(error.message);
+                }
+            });
+        }
+        
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                const needsBackup = CodeForNLID.needsBackup();
+                let shouldLogout = true;
+                
+                if (needsBackup) {
+                    shouldLogout = confirm('Weet je zeker dat je wilt uitloggen? Je verliest je chat identiteit.');
+                }
+                
+                if (shouldLogout) {
+                    CodeForNLID.logout();
+                    location.reload();
+                }
+            });
+        }
+        
+        if (importKeyBtn) {
+            importKeyBtn.addEventListener('click', () => {
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.accept = '.png,.jpg,.jpeg';
+                fileInput.style.display = 'none';
+                document.body.appendChild(fileInput);
+                
+                fileInput.addEventListener('change', async (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        try {
+                            await CodeForNLID.importIDFromImage(file);
+                            location.reload();
+                        } catch (error) {
+                            alert('Kon Code for NL ID niet uit afbeelding halen: ' + error.message);
+                        }
+                    }
+                    document.body.removeChild(fileInput);
+                });
+                
+                fileInput.click();
+            });
+        }
+        
+        if (newAccountBtn) {
+            newAccountBtn.addEventListener('click', async () => {
+                const username = prompt('Wat is je gebruikersnaam voor de chat?');
+                if (username && username.trim()) {
+                    try {
+                        await CodeForNLID.createNewID(username);
+                        location.reload();
+                    } catch (error) {
+                        alert(error.message);
+                    }
+                }
+            });
+        }
     }
     
     updateUserStatus();
@@ -184,6 +260,7 @@ export default function Chat(rootEl) {
     }
     
 
+    
     return {
         loadChannels,
         loadChannel

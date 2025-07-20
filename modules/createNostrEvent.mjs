@@ -1,28 +1,14 @@
-import { getPublicKey, getEventHash, utils as nostrUtils } from 'https://esm.sh/nostr-tools';
+import { getEventHash, utils as nostrUtils } from 'https://esm.sh/nostr-tools';
 import { schnorr } from 'https://esm.sh/@noble/curves/secp256k1';
+import CodeForNLID from './CodeForNLID.mjs';
 
 export default async function createNostrEvent(content, tag) {
-  let privkey = localStorage.getItem("nostr_privkey");
-  let pubkey = localStorage.getItem("nostr_pubkey");
-  let username = localStorage.getItem("nostr_username");
+  const privkey = CodeForNLID.getPrivateKey();
+  const pubkey = CodeForNLID.getPublicKey();
+  const username = CodeForNLID.getCurrentUsername();
 
   if (!privkey || !pubkey) {
-    const bytes = crypto.getRandomValues(new Uint8Array(32));
-    privkey = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
-    pubkey = getPublicKey(privkey);
-    localStorage.setItem("nostr_privkey", privkey);
-    localStorage.setItem("nostr_pubkey", pubkey);
-  }
-  
-  if (!username) {
-    username = prompt("Wat is je gebruikersnaam voor de chat?");
-    if (username && username.trim()) {
-      username = username.trim();
-      localStorage.setItem("nostr_username", username);
-    } else {
-      username = "Anoniem";
-      localStorage.setItem("nostr_username", username);
-    }
+    throw new Error('Geen Code for NL ID gevonden. Log eerst in of maak een nieuw ID aan.');
   }
 
   const event = {
