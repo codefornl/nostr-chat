@@ -3,6 +3,19 @@ import Message from './Message.mjs';
 export default function MessagesViewer() {
     const _messagesEl = document.createElement('div');
     _messagesEl.className = 'channel-messages';
+    _messagesEl.setAttribute('role', 'log');
+    _messagesEl.setAttribute('aria-live', 'polite');
+    _messagesEl.setAttribute('aria-label', 'Chat berichten');
+    _messagesEl.setAttribute('tabindex', '0'); // Make messages container focusable
+    
+    // When messages container gets focus, focus on newest message
+    _messagesEl.addEventListener('focus', () => {
+        const messages = _messagesEl.querySelectorAll('.message');
+        if (messages.length > 0) {
+            // Focus newest message and remove focus from container
+            messages[messages.length - 1].focus();
+        }
+    });
     
     const _messages = new Map();
     let _isUserScrolling = false;
@@ -21,6 +34,34 @@ export default function MessagesViewer() {
         _scrollTimeout = setTimeout(() => {
             _isUserScrolling = false;
         }, 150);
+    });
+    
+    // Add keyboard navigation for messages (chat-style navigation)
+    _messagesEl.addEventListener('keydown', (event) => {
+        const focusedElement = document.activeElement;
+        const messages = Array.from(_messagesEl.querySelectorAll('.message'));
+        const currentIndex = messages.indexOf(focusedElement);
+        
+        // Arrow Down = go to newer message (higher index, further down in chat)
+        if (event.key === 'ArrowDown' && currentIndex >= 0 && currentIndex < messages.length - 1) {
+            event.preventDefault();
+            messages[currentIndex + 1].focus();
+        } 
+        // Arrow Up = go to older message (lower index, further up in chat)
+        else if (event.key === 'ArrowUp' && currentIndex > 0) {
+            event.preventDefault();
+            messages[currentIndex - 1].focus();
+        } 
+        // Home = go to oldest message (first message)
+        else if (event.key === 'Home' && messages.length > 0) {
+            event.preventDefault();
+            messages[0].focus();
+        } 
+        // End = go to newest message (last message)
+        else if (event.key === 'End' && messages.length > 0) {
+            event.preventDefault();
+            messages[messages.length - 1].focus();
+        }
     });
     
     function addMessage(event) {

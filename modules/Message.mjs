@@ -64,10 +64,14 @@ export default function Message(event) {
     const _messageEl = createMessageElement();
     
     function createMessageElement() {
-        const messageEl = document.createElement('div');
+        const messageEl = document.createElement('article');
         messageEl.className = 'message';
         messageEl.setAttribute('data-pubkey', _event.pubkey);
         messageEl.setAttribute('data-event-id', _event.id);
+        messageEl.setAttribute('role', 'article');
+        messageEl.setAttribute('tabindex', '0');
+        messageEl.setAttribute('aria-labelledby', `msg-${_event.id}-username`);
+        messageEl.setAttribute('aria-describedby', `msg-${_event.id}-content msg-${_event.id}-time`);
         
         // Extract username from event tags
         let username = 'Anoniem';
@@ -88,12 +92,15 @@ export default function Message(event) {
         const headerEl = document.createElement('div');
         headerEl.className = 'message-header';
         
-        const usernameEl = document.createElement('span');
+        const usernameEl = document.createElement('h3');
         usernameEl.className = 'message-username';
+        usernameEl.id = `msg-${_event.id}-username`;
         usernameEl.textContent = username;
         
-        const timeEl = document.createElement('span');
+        const timeEl = document.createElement('time');
         timeEl.className = 'message-time';
+        timeEl.id = `msg-${_event.id}-time`;
+        timeEl.setAttribute('datetime', new Date(_event.created_at * 1000).toISOString());
         timeEl.textContent = new Date(_event.created_at * 1000).toLocaleString('nl-NL', {
             hour: '2-digit',
             minute: '2-digit',
@@ -109,6 +116,8 @@ export default function Message(event) {
         
         const contentEl = document.createElement('div');
         contentEl.className = 'message-content';
+        contentEl.id = `msg-${_event.id}-content`;
+        contentEl.setAttribute('role', 'text');
         contentEl.innerHTML = linkifyText(_event.content);
         
         messageBodyEl.appendChild(headerEl);

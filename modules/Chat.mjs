@@ -49,6 +49,8 @@ export default function Chat(rootEl) {
 
     const channelsMenuEl = document.createElement('div');
     channelsMenuEl.className = 'channels-menu';
+    channelsMenuEl.setAttribute('role', 'navigation');
+    channelsMenuEl.setAttribute('aria-label', 'Kanaal navigatie en gebruikersinstellingen');
     
     const userStatusEl = document.createElement('div');
     userStatusEl.className = 'user-status';
@@ -193,10 +195,15 @@ export default function Chat(rootEl) {
             channelsMenuEl.classList.remove('open');
             sidebarOverlayEl.classList.remove('active');
             channelsContainerEl.classList.remove('sidebar-open');
+            // Update ARIA state
+            updateMenuToggleAriaExpanded(false);
         } else {
             channelsMenuEl.classList.add('open');
             sidebarOverlayEl.classList.add('active');
             channelsContainerEl.classList.add('sidebar-open');
+            // Update ARIA state and focus first menu item
+            updateMenuToggleAriaExpanded(true);
+            focusFirstChannelMenuItem();
         }
         
         // Scroll to bottom after sidebar animation completes (only if needed)
@@ -208,8 +215,36 @@ export default function Chat(rootEl) {
         }, 350);
     }
     
+    function updateMenuToggleAriaExpanded(isExpanded) {
+        const menuToggleButtons = document.querySelectorAll('.menu-toggle');
+        menuToggleButtons.forEach(button => {
+            button.setAttribute('aria-expanded', isExpanded.toString());
+        });
+    }
+    
+    function focusFirstChannelMenuItem() {
+        setTimeout(() => {
+            const firstMenuItem = channelsMenuEl.querySelector('.channel-menu');
+            if (firstMenuItem) {
+                firstMenuItem.focus();
+            }
+        }, 100);
+    }
+    
     // Close sidebar when clicking overlay
     sidebarOverlayEl.addEventListener('click', toggleSidebar);
+    
+    // Add keyboard support for sidebar closing
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && channelsMenuEl.classList.contains('open')) {
+            toggleSidebar();
+            // Return focus to menu toggle button
+            const menuToggle = document.querySelector('.menu-toggle');
+            if (menuToggle) {
+                menuToggle.focus();
+            }
+        }
+    });
     
     // Add event delegation for menu toggle buttons
     document.addEventListener('click', (event) => {
@@ -242,7 +277,7 @@ export default function Chat(rootEl) {
             channel.setActive(false);
         }
         
-        channelMenuEl.addEventListener('click', () => {
+        function switchToChannel() {
             // Mark previous channel as inactive
             if (_currentChannel) {
                 _currentChannel.getRootEl().style.display = 'none';
@@ -257,15 +292,42 @@ export default function Chat(rootEl) {
             // Auto-scroll to bottom when switching channels
             _currentChannel.scrollToBottom();
             
-            // Update menu appearance
+            // Update menu appearance and ARIA states
             document.querySelectorAll('.channel-menu').forEach(menu => {
                 menu.classList.remove('active');
+                menu.setAttribute('aria-selected', 'false');
             });
             channelMenuEl.classList.add('active');
+            channelMenuEl.setAttribute('aria-selected', 'true');
+            
+            // Focus management - focus newest message in new channel
+            setTimeout(() => {
+                const messages = _currentChannel.getRootEl().querySelectorAll('.message');
+                if (messages.length > 0) {
+                    // Focus on the last (newest) message
+                    messages[messages.length - 1].focus();
+                } else {
+                    // No messages, focus on input
+                    const messageInput = _currentChannel.getRootEl().querySelector('#message-input');
+                    if (messageInput) {
+                        messageInput.focus();
+                    }
+                }
+            }, 100);
             
             // Close sidebar on mobile after selecting channel
             if (window.innerWidth < 768) {
                 toggleSidebar();
+            }
+        }
+
+        channelMenuEl.addEventListener('click', switchToChannel);
+        
+        // Add keyboard support for channel switching
+        channelMenuEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                switchToChannel();
             }
         });
         

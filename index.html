@@ -17,7 +17,8 @@
         <link rel="apple-touch-icon" href="assets/img/icon-192.png">
     </head>
     <body>
-        <div class="chat"></div>
+        <a href="#main-content" class="skip-link">Spring naar hoofdinhoud</a>
+        <div class="chat" id="main-content"></div>
         <script type="module">
             import Chat from './modules/Chat.mjs';
             const chat = new Chat(document.querySelector('.chat'));

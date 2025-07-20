@@ -14,16 +14,20 @@ export default function Channel(options) {
 
     const _menuEl = document.createElement('div');
     _menuEl.className = 'channel-menu';
+    _menuEl.setAttribute('role', 'button');
+    _menuEl.setAttribute('tabindex', '0');
+    _menuEl.setAttribute('aria-label', `Schakel naar ${_label} kanaal`);
     _menuEl.innerHTML = `
         <span class="channel-name">${_label}</span>
-        <span class="unread-counter" style="display: none;">0</span>
+        <span class="unread-counter" style="display: none;" aria-label="ongelezen berichten">0</span>
     `;
 
     const _headerEl = document.createElement('div');
     _headerEl.className = 'channel-header';
+    _headerEl.setAttribute('role', 'banner');
     _headerEl.innerHTML = `
-        <button class="menu-toggle">☰</button>
-        <h2>${_label}</h2>
+        <button class="menu-toggle" aria-label="Menu openen" aria-expanded="false">☰</button>
+        <h1>${_label}</h1>
         <div class="header-logo">
             <img src="https://codefor.nl/img/Logo-orange-01.png" alt="Code for NL" class="logo" />
         </div>
