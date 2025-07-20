@@ -27,6 +27,7 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;
+    height: 100dvh; /* Use dynamic viewport height for mobile */
     font-family: var(--font-family);
     font-size: var(--font-size-base);
     color: var(--text-dark);
@@ -48,6 +49,7 @@ html, body {
     background: var(--background-white);
     color: var(--text-dark);
     height: 100vh;
+    height: 100dvh; /* Use dynamic viewport height for mobile */
     display: flex;
     flex-direction: column;
     transform: translateX(-100%);
@@ -250,6 +252,7 @@ html, body {
 .channels-container {
     flex: 1;
     height: 100vh;
+    height: 100dvh; /* Use dynamic viewport height for mobile */
     position: relative;
 }
 
