@@ -96,8 +96,8 @@ export default function ChannelManager(channelsContainerEl, channels, channelsMe
         _currentChannel.getRootEl().style.display = 'block';
         _currentChannel.setActive(true);
 
-        // Update ARIA states for screen readers
-        updateChannelMenuAriaStates(channel);
+        // Update menu visual and accessibility states
+        updateChannelMenuStates(channel);
         
         // Focus management - focus newest message in new channel
         setTimeout(() => {
@@ -122,14 +122,16 @@ export default function ChannelManager(channelsContainerEl, channels, channelsMe
         }
     }
     
-    function updateChannelMenuAriaStates(activeChannel) {
+    function updateChannelMenuStates(activeChannel) {
         _channels.forEach(channel => {
             const menuEl = channel.getMenuEl();
-            if (channel === activeChannel) {
-                menuEl.setAttribute('aria-selected', 'true');
-            } else {
-                menuEl.setAttribute('aria-selected', 'false');
-            }
+            const isActive = channel === activeChannel;
+            
+            // Update ARIA state for screen readers
+            menuEl.setAttribute('aria-selected', isActive.toString());
+            
+            // Update CSS class for visual feedback
+            menuEl.classList.toggle('active', isActive);
         });
     }
 
@@ -137,6 +139,7 @@ export default function ChannelManager(channelsContainerEl, channels, channelsMe
         loadChannels,
         loadChannel,
         switchToChannel,
-        getChannels: () => _channels
+        getChannels: () => _channels,
+        tryPendingChannelSwitch: null // Will be set by setupURLRouting
     };
 }

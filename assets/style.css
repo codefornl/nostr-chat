@@ -377,128 +377,126 @@ html, body {
 .channel {
     height: 100%;
     position: relative;
-    
-    .channel-header {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        background: var(--background-white);
-        color: var(--text-dark);
-        height: var(--header-height);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 20px;
-        border-bottom: 1px solid var(--border-light);
-        box-shadow: var(--shadow);
-        z-index: 10;
-        
-        .header-logo {
-            display: flex;
-            align-items: center;
-        }
-        
-        .logo {
-            height: 32px;
-            width: auto;
-        }
-        
-        h1 {
-            margin: 0;
-            font-size: var(--font-size-lg);
-            font-weight: var(--font-weight-bold);
-            color: var(--codefor-orange);
-        }
-        
-        .menu-toggle {
-            background: none;
-            border: none;
-            color: var(--text-dark);
-            font-size: 20px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 4px;
-            transition: background-color 0.2s ease;
-        }
-        
-        .menu-toggle:hover {
-            background: var(--background-light);
-            
-        }
-    }
-    
-    .channel-messages {
-        position: absolute;
-        top: var(--header-height);
-        bottom: var(--composer-height);
-        left: 0;
-        right: 0;
-        overflow-y: auto;
-        padding: 20px;
-        background: var(--background-white);
-    }
-    
-    .channel-composer {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: var(--background-white);
-        display: flex;
-        height: var(--composer-height);
-        padding: 12px 20px;
-        border-top: 1px solid var(--border-light);
-        box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
-        box-sizing: border-box;
-        gap: 12px;
-        z-index: 10;
-        
-        input[name="message"] {
-            flex: 1;
-            padding: 12px 16px;
-            font-size: var(--font-size-base);
-            font-family: var(--font-family);
-            border: 1px solid var(--border-light);
-            border-radius: 6px;
-            background: var(--background-white);
-            color: var(--text-dark);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-        
-        input[name="message"]::placeholder {
-            color: var(--text-light);
-        }
-        
-        input[name="message"]:focus {
-            outline: 2px solid var(--codefor-orange);
-            outline-offset: 2px;
-            border-color: var(--codefor-orange);
-            box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.1);
-        }
-        
-        button {
-            min-width: 100px;
-            padding: 12px 20px;
-            background: var(--codefor-orange);
-            border: none;
-            color: white;
-            font-weight: var(--font-weight-medium);
-            font-family: var(--font-family);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-        }
-        
-        .channel-composer button:hover {
-            background: var(--codefor-orange-dark);
-        }
-        
-        .channel-composer button:active {
-            transform: translateY(1px);
-            
-        }
-    }
+}
+
+.channel .channel-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--content-bg);
+    color: var(--content-text);
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--content-border);
+    box-shadow: var(--shadow);
+    z-index: 10;
+}
+
+.channel .channel-header .header-logo {
+    display: flex;
+    align-items: center;
+}
+
+.channel .channel-header .logo {
+    height: 32px;
+    width: auto;
+}
+
+.channel .channel-header h1 {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--codefor-orange);
+}
+
+.channel .channel-header .menu-toggle {
+    background: none;
+    border: none;
+    color: var(--content-text);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.channel .channel-header .menu-toggle:hover {
+    background: var(--hover-bg);
+}
+
+.channel .channel-messages {
+    position: absolute;
+    top: var(--header-height);
+    bottom: var(--composer-height);
+    left: 0;
+    right: 0;
+    overflow-y: auto;
+    padding: 20px;
+    background: var(--content-bg);
+}
+
+.channel .channel-composer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--content-bg);
+    display: flex;
+    height: var(--composer-height);
+    padding: 12px 20px;
+    border-top: 1px solid var(--content-border);
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+    gap: 12px;
+    z-index: 10;
+}
+
+.channel .channel-composer input[name="message"] {
+    flex: 1;
+    padding: 12px 16px;
+    font-size: var(--font-size-base);
+    font-family: var(--font-family);
+    border: 1px solid var(--content-border);
+    border-radius: 6px;
+    background: var(--content-bg);
+    color: var(--content-text);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.channel .channel-composer input[name="message"]::placeholder {
+    color: var(--content-text-muted);
+}
+
+.channel .channel-composer input[name="message"]:focus {
+    outline: 2px solid var(--codefor-orange);
+    outline-offset: 2px;
+    border-color: var(--codefor-orange);
+    box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.1);
+}
+
+.channel .channel-composer button {
+    min-width: 100px;
+    padding: 12px 20px;
+    background: var(--codefor-orange);
+    border: none;
+    color: white;
+    font-weight: var(--font-weight-medium);
+    font-family: var(--font-family);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.channel .channel-composer button:hover {
+    background: var(--codefor-orange-dark);
+}
+
+.channel .channel-composer button:active {
+    transform: translateY(1px);
 }
 
 /* Screen reader only class */

@@ -118,33 +118,71 @@ async function loadChannelConfig(channelManager) {
         const channelsConfig = await response.json();
         channelManager.loadChannels(channelsConfig);
         setChannelSwitchGlobal(channelManager.getChannels(), channelManager.switchToChannel);
+        
+        // Try pending URL channel switch after channels are loaded
+        if (channelManager.tryPendingChannelSwitch) {
+            channelManager.tryPendingChannelSwitch();
+        }
     } catch (error) {
         console.error('Error loading channel configuration:', error);
         // Fallback to default channel if config fails
         channelManager.loadChannel(APP_CONFIG.FALLBACKS.CHANNEL);
         setChannelSwitchGlobal(channelManager.getChannels(), channelManager.switchToChannel);
+        
+        // Try pending URL channel switch after fallback channel is loaded
+        if (channelManager.tryPendingChannelSwitch) {
+            channelManager.tryPendingChannelSwitch();
+        }
     }
 }
 
 function setupURLRouting(channelManager) {
-    // Handle initial URL hash
-    function handleHashChange() {
+    const URL_RETRY_DELAYS = [50, 200, 500, 1000];
+    let pendingChannelId = null;
+    
+    function extractChannelIdFromHash() {
         const hash = window.location.hash;
-        if (hash.startsWith('#/') && hash.length > 2) {
-            const channelId = hash.substring(2); // Remove '#/' prefix
-            const channels = channelManager.getChannels();
-            const channel = channels.find(c => c.getId() === channelId);
-            if (channel) {
-                channelManager.switchToChannel(channel);
+        return (hash.startsWith('#/') && hash.length > 2) ? hash.substring(2) : null;
+    }
+    
+    function findChannelById(channelId) {
+        return channelManager.getChannels().find(c => c.getId() === channelId);
+    }
+    
+    function attemptChannelSwitch(channelId) {
+        const channel = findChannelById(channelId);
+        if (channel) {
+            channelManager.switchToChannel(channel);
+            pendingChannelId = null;
+            return true;
+        }
+        return false;
+    }
+    
+    function handleHashChange() {
+        const channelId = extractChannelIdFromHash();
+        if (channelId) {
+            if (!attemptChannelSwitch(channelId)) {
+                // Channel not found yet, store for later retry
+                pendingChannelId = channelId;
             }
         }
     }
     
-    // Listen for hash changes
+    function tryPendingChannelSwitch() {
+        if (pendingChannelId) {
+            attemptChannelSwitch(pendingChannelId);
+        }
+    }
+    
+    // Set up event listeners and retry logic
     window.addEventListener('hashchange', handleHashChange);
     
-    // Handle initial page load
-    setTimeout(handleHashChange, 100); // Wait for channels to load
+    // Handle initial page load with progressive retry delays
+    URL_RETRY_DELAYS.forEach(delay => {
+        setTimeout(handleHashChange, delay);
+    });
     
-    // URL updates are now handled directly in ChannelManager.mjs
+    // Expose retry function for post-load channel switching
+    channelManager.tryPendingChannelSwitch = tryPendingChannelSwitch;
 }
