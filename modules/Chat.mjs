@@ -19,6 +19,7 @@ export default function Chat(rootEl) {
     const managers = createManagers(ui, _channels);
     
     loadConfigurations(managers);
+    setupURLRouting(managers.channelManager);
 
     return {
         loadChannels: managers.channelManager.loadChannels.bind(managers.channelManager),
@@ -123,4 +124,27 @@ async function loadChannelConfig(channelManager) {
         channelManager.loadChannel(APP_CONFIG.FALLBACKS.CHANNEL);
         setChannelSwitchGlobal(channelManager.getChannels(), channelManager.switchToChannel);
     }
+}
+
+function setupURLRouting(channelManager) {
+    // Handle initial URL hash
+    function handleHashChange() {
+        const hash = window.location.hash;
+        if (hash.startsWith('#/') && hash.length > 2) {
+            const channelId = hash.substring(2); // Remove '#/' prefix
+            const channels = channelManager.getChannels();
+            const channel = channels.find(c => c.getId() === channelId);
+            if (channel) {
+                channelManager.switchToChannel(channel);
+            }
+        }
+    }
+    
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange);
+    
+    // Handle initial page load
+    setTimeout(handleHashChange, 100); // Wait for channels to load
+    
+    // URL updates are now handled directly in ChannelManager.mjs
 }

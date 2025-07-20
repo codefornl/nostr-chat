@@ -106,7 +106,7 @@ export default function ChannelManager(channelsContainerEl, channels, channelsMe
                 messages[messages.length - 1].focus();
             } else {
                 // No messages, focus on input if available
-                const messageInput = _currentChannel.getRootEl().querySelector('#message-input');
+                const messageInput = _currentChannel.getRootEl().querySelector('input[name="message"]');
                 if (messageInput) {
                     messageInput.focus();
                 }
@@ -114,6 +114,12 @@ export default function ChannelManager(channelsContainerEl, channels, channelsMe
         }, 100);
 
         _currentChannel.scrollToBottom();
+        
+        // Update URL to reflect current channel
+        const newHash = `#/${channel.getId()}`;
+        if (window.location.hash !== newHash) {
+            history.replaceState(null, null, newHash);
+        }
     }
     
     function updateChannelMenuAriaStates(activeChannel) {

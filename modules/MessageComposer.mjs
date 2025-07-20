@@ -1,14 +1,18 @@
 import createNostrEvent from './createNostrEvent.mjs';
 
 export default function MessageComposer(tag, relays) {
+    // Generate unique IDs for this composer instance
+    const composerId = `composer-${tag}-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+    const inputId = `message-input-${composerId}`;
+    const helpId = `message-help-${composerId}`;
 
     const _messageComposerEl = document.createElement('div');
     _messageComposerEl.className = 'channel-composer';
     _messageComposerEl.innerHTML = `
-        <label for="message-input" class="sr-only">Type je bericht hier</label>
-        <input id="message-input" name="message" type="text" placeholder="Schrijf je bericht hier..." aria-describedby="message-help" />
+        <label for="${inputId}" class="sr-only">Type je bericht hier</label>
+        <input id="${inputId}" name="message" type="text" placeholder="Schrijf je bericht hier..." aria-describedby="${helpId}" />
         <button type="submit" aria-label="Bericht verzenden">Post</button>
-        <div id="message-help" class="sr-only">Druk op Enter om je bericht te verzenden</div>
+        <div id="${helpId}" class="sr-only">Druk op Enter om je bericht te verzenden</div>
     `;
 
     const _inputEl = _messageComposerEl.querySelector('input[name="message"]');

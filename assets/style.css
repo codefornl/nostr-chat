@@ -343,7 +343,7 @@ html, body {
             margin: 0;
             font-size: var(--font-size-lg);
             font-weight: var(--font-weight-bold);
-            color: var(--primary-orange);
+            color: var(--codefor-orange);
         }
         
         .menu-toggle {
@@ -406,16 +406,16 @@ html, body {
         }
         
         input[name="message"]:focus {
-            outline: 2px solid var(--primary-orange);
+            outline: 2px solid var(--codefor-orange);
             outline-offset: 2px;
-            border-color: var(--primary-orange);
+            border-color: var(--codefor-orange);
             box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.1);
         }
         
         button {
             min-width: 100px;
             padding: 12px 20px;
-            background: var(--primary-orange);
+            background: var(--codefor-orange);
             border: none;
             color: white;
             font-weight: var(--font-weight-medium);
@@ -426,7 +426,7 @@ html, body {
         }
         
         .channel-composer button:hover {
-            background: var(--primary-orange-dark);
+            background: var(--codefor-orange-dark);
         }
         
         .channel-composer button:active {
@@ -454,7 +454,7 @@ html, body {
     position: absolute;
     top: -40px;
     left: 6px;
-    background: var(--primary-orange);
+    background: var(--codefor-orange);
     color: white;
     padding: 8px 16px;
     text-decoration: none;
@@ -653,7 +653,7 @@ button,
 }
 
 .opendiensten-link a:hover {
-    color: var(--primary-orange-dark);
+    color: var(--codefor-orange-dark);
     text-decoration: underline;
 }
 
