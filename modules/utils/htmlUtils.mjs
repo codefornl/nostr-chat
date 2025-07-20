@@ -79,7 +79,9 @@ export function linkifyChannels(text, channelNames) {
     // Regex voor hashtags: #kanaalnaam (letters, cijfers, underscores, minimaal 2 tekens)
     return text.replace(/#([a-zA-Z0-9_\-]{2,})/g, (match, kanaal) => {
         if (channelNames.includes(kanaal)) {
-            return `<a href="#" class="channel-link" data-channel="${kanaal}">${match}</a>`;
+            return `<a href="#" class="channel-link" data-channel="${kanaal}" title="Ga naar #${kanaal} kanaal">
+                <span class="channel-hash">#</span><span class="channel-name">${kanaal}</span>
+            </a>`;
         }
         return match;
     });

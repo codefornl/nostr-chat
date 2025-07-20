@@ -72,6 +72,14 @@ export default function ChannelManager(channelsContainerEl, channels, channelsMe
         }
 
         channelMenuEl.addEventListener('click', () => switchToChannel(channel));
+        
+        // Add keyboard support for accessibility
+        channelMenuEl.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                switchToChannel(channel);
+            }
+        });
 
         if (_relays && _relays.length > 0) {
             channel.registerRelays(_relays);
@@ -88,7 +96,35 @@ export default function ChannelManager(channelsContainerEl, channels, channelsMe
         _currentChannel.getRootEl().style.display = 'block';
         _currentChannel.setActive(true);
 
+        // Update ARIA states for screen readers
+        updateChannelMenuAriaStates(channel);
+        
+        // Focus management - focus newest message in new channel
+        setTimeout(() => {
+            const messages = _currentChannel.getRootEl().querySelectorAll('.message');
+            if (messages.length > 0) {
+                messages[messages.length - 1].focus();
+            } else {
+                // No messages, focus on input if available
+                const messageInput = _currentChannel.getRootEl().querySelector('#message-input');
+                if (messageInput) {
+                    messageInput.focus();
+                }
+            }
+        }, 100);
+
         _currentChannel.scrollToBottom();
+    }
+    
+    function updateChannelMenuAriaStates(activeChannel) {
+        _channels.forEach(channel => {
+            const menuEl = channel.getMenuEl();
+            if (channel === activeChannel) {
+                menuEl.setAttribute('aria-selected', 'true');
+            } else {
+                menuEl.setAttribute('aria-selected', 'false');
+            }
+        });
     }
 
     return {

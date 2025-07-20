@@ -3,16 +3,67 @@
     --header-height: 60px;
     --composer-height: 60px;
     
-    /* Code for NL color scheme */
-    --primary-orange: #ff6600;
-    --primary-orange-dark: #e55a00;
-    --background-light: #f8f9fa;
-    --background-white: #ffffff;
-    --text-dark: #2c3e50;
-    --text-light: #6c757d;
-    --border-light: #e9ecef;
-    --shadow: 0 2px 4px rgba(0,0,0,0.1);
+    /* Code for NL official color scheme */
+    --codefor-orange: #ff6600;
+    --codefor-orange-dark: #e55a00;
+    --codefor-orange-light: #ff8533;
     
+    /* Sidebar/menu colors - donkergrijs zoals relays sectie */
+    --sidebar-bg: #2c3e50;
+    --sidebar-bg-light: #34495e;
+    --sidebar-bg-dark: #1a252f;
+    --sidebar-text: #ecf0f1;
+    --sidebar-text-muted: #bdc3c7;
+    --sidebar-border: #34495e;
+    --sidebar-hover: #3c5064;
+    --sidebar-active: #4a6078;
+    
+    /* Main content colors - wit/licht zoals codefor.nl */
+    --content-bg: #ffffff;
+    --content-bg-alt: #f8f9fa;
+    --content-text: #2c3e50;
+    --content-text-muted: #7f8c8d;
+    --content-border: #ecf0f1;
+    
+    /* Interactive elements */
+    --hover-bg: #f1f2f6;
+    --active-bg: #dfe4ea;
+    --focus-color: var(--codefor-orange);
+    
+    /* Cards and surfaces */
+    --card-bg: #ffffff;
+    --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    --shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Dark mode colors */
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Sidebar wordt nog donkerder in dark mode */
+        --sidebar-bg: #1a252f;
+        --sidebar-bg-light: #2c3e50;
+        --sidebar-bg-dark: #0f1419;
+        --sidebar-text: #f8f9fa;
+        --sidebar-text-muted: #95a5a6;
+        --sidebar-border: #2c3e50;
+        --sidebar-hover: #34495e;
+        --sidebar-active: #3c5064;
+        
+        /* Content wordt donker */
+        --content-bg: #1e1e1e;
+        --content-bg-alt: #2a2a2a;
+        --content-text: #e8eaed;
+        --content-text-muted: #bdc1c6;
+        --content-border: #3c4043;
+        
+        --hover-bg: #3a3a3a;
+        --active-bg: #4a4a4a;
+        --card-bg: #2d2d2d;
+        --card-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+}
+
+:root {
     /* Typography */
     --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     --font-size-base: 16px;
@@ -30,8 +81,8 @@ html, body {
     height: 100dvh; /* Use dynamic viewport height for mobile */
     font-family: var(--font-family);
     font-size: var(--font-size-base);
-    color: var(--text-dark);
-    background-color: var(--background-light);
+    color: var(--content-text);
+    background-color: var(--content-bg);
 }
 
 .chat {
@@ -46,14 +97,15 @@ html, body {
     left: 0;
     top: 0;
     width: var(--sidebar-width);
-    background: var(--background-white);
-    color: var(--text-dark);
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
     height: 100vh;
     height: 100dvh; /* Use dynamic viewport height for mobile */
     display: flex;
     flex-direction: column;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
+    border-right: 1px solid var(--sidebar-border);
     z-index: 1000;
     border-right: 1px solid var(--border-light);
     box-shadow: var(--shadow);
@@ -65,9 +117,9 @@ html, body {
 
 .channels-menu .user-status {
     padding: 20px;
-    border-bottom: 1px solid var(--border-light);
-    background: var(--primary-orange);
-    color: white;
+    border-bottom: 1px solid var(--sidebar-border);
+    background: var(--sidebar-bg-light);
+    color: var(--sidebar-text);
 }
 
 .channels-menu .user-status h3 {
@@ -205,8 +257,8 @@ html, body {
     padding: 15px 20px;
     cursor: pointer;
     font-weight: var(--font-weight-medium);
-    color: var(--text-dark);
-    border-bottom: 1px solid var(--border-light);
+    color: var(--sidebar-text);
+    border-bottom: 1px solid var(--sidebar-border);
     transition: all 0.2s ease;
     display: flex;
     justify-content: space-between;
@@ -214,14 +266,15 @@ html, body {
 }
 
 .channels-menu .channel-menu:hover {
-    background: var(--background-light);
-    color: var(--primary-orange);
+    background: var(--sidebar-hover);
+    color: var(--sidebar-text);
 }
 
 .channels-menu .channel-menu.active {
-    background: var(--primary-orange);
+    background: var(--codefor-orange);
     color: white;
     font-weight: var(--font-weight-bold);
+    border-left: 4px solid var(--codefor-orange-light);
 }
 
 .channels-menu .channel-menu.has-unread {
@@ -233,7 +286,7 @@ html, body {
 }
 
 .channels-menu .channel-menu .unread-counter {
-    background: var(--primary-orange);
+    background: var(--codefor-orange);
     color: white;
     border-radius: 12px;
     padding: 2px 8px;
@@ -419,7 +472,7 @@ html, body {
 button:focus,
 .channel-menu:focus,
 .menu-toggle:focus {
-    outline: 2px solid var(--primary-orange);
+    outline: 2px solid var(--codefor-orange);
     outline-offset: 2px;
 }
 
@@ -492,22 +545,32 @@ button,
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    padding: 12px 16px;
-    margin-bottom: 8px;
-    border-radius: 8px;
-    background: var(--background-light);
-    border-left: 3px solid var(--primary-orange);
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--content-border);
+    border-left: 4px solid var(--codefor-orange);
+    box-shadow: var(--card-shadow);
     font-size: var(--font-size-base);
     line-height: 1.5;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
     cursor: pointer;
+    position: relative;
 }
 
-.message:hover,
+.message:hover {
+    background: var(--hover-bg);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(255, 102, 0, 0.1);
+    border-left-color: var(--codefor-orange-light);
+    border-color: var(--codefor-orange-light);
+}
+
 .message:focus {
-    background: #f0f0f0;
-    outline: 2px solid var(--primary-orange);
+    outline: 2px solid var(--codefor-orange);
     outline-offset: 2px;
+    background: var(--hover-bg);
 }
 
 .message-avatar {
@@ -534,32 +597,33 @@ button,
 
 .message-username {
     font-size: var(--font-size-lg);
-    color: var(--primary-orange);
+    color: var(--codefor-orange);
     font-weight: var(--font-weight-bold);
     margin: 0 0 2px 0; /* Reset h3 default margins */
 }
 
 .message-time {
     font-size: 12px;
-    color: var(--text-light);
+    color: var(--content-text-muted);
     font-weight: var(--font-weight-normal);
     opacity: 0.8;
     white-space: nowrap;
 }
 
 .message-content {
-    color: var(--text-dark);
+    color: var(--content-text);
     word-wrap: break-word;
+    line-height: 1.6;
 }
 
 .message-link {
-    color: var(--primary-orange);
+    color: var(--codefor-orange);
     text-decoration: underline;
     transition: color 0.2s ease;
 }
 
 .message-link:hover {
-    color: var(--primary-orange-dark);
+    color: var(--codefor-orange-dark);
     text-decoration: none;
 }
 
@@ -611,6 +675,56 @@ button,
     opacity: 1;
     visibility: visible;
     
+}
+
+/* Channel link styling - modern Code for NL style */
+.channel-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    background: var(--card-bg);
+    color: var(--content-text-muted);
+    text-decoration: none;
+    padding: 4px 10px 4px 8px;
+    border-radius: 16px;
+    font-size: 0.85em;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 1px solid var(--content-border);
+    box-shadow: var(--card-shadow);
+    vertical-align: middle;
+}
+
+.channel-link:hover {
+    background: var(--hover-bg);
+    color: var(--codefor-orange);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 102, 0, 0.15);
+    border-color: var(--codefor-orange-light);
+}
+
+.channel-link:active {
+    transform: translateY(0);
+    background: var(--active-bg);
+}
+
+.channel-link .channel-hash {
+    font-weight: 600;
+    opacity: 0.7;
+    font-size: 0.9em;
+    color: var(--content-text-muted);
+}
+
+.channel-link .channel-name {
+    font-weight: 500;
+}
+
+/* Focus styles for accessibility */
+.channel-link:focus {
+    outline: 2px solid var(--codefor-orange);
+    outline-offset: 2px;
+    background: var(--hover-bg);
+    color: var(--codefor-orange);
 }
 
 /* Mobile-first responsive design */
