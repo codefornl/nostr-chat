@@ -202,17 +202,16 @@ html, body {
 
 .channels-container {
     flex: 1;
-    margin-left: 0;
-    transition: margin-left 0.3s ease;
-    
-    &.sidebar-open {
-        margin-left: var(--sidebar-width);
-    }
+    height: 100vh;
+    position: relative;
 }
 
 .channel {
+    height: 100%;
+    position: relative;
+    
     .channel-header {
-        position: fixed;
+        position: absolute;
         top: 0;
         left: 0;
         right: 0;
@@ -223,10 +222,9 @@ html, body {
         align-items: center;
         justify-content: space-between;
         padding: 0 20px;
-        z-index: 100;
         border-bottom: 1px solid var(--border-light);
         box-shadow: var(--shadow);
-        transition: left 0.3s ease;
+        z-index: 10;
         
         .header-logo {
             display: flex;
@@ -262,21 +260,18 @@ html, body {
     }
     
     .channel-messages {
-        position: fixed;
-        height: calc(100vh - var(--header-height) - var(--composer-height));
+        position: absolute;
         top: var(--header-height);
+        bottom: var(--composer-height);
         left: 0;
         right: 0;
-        bottom: var(--composer-height);
         overflow-y: auto;
         padding: 20px;
-        box-sizing: border-box;
-        transition: left 0.3s ease;
         background: var(--background-white);
     }
     
     .channel-composer {
-        position: fixed;
+        position: absolute;
         bottom: 0;
         left: 0;
         right: 0;
@@ -284,11 +279,11 @@ html, body {
         display: flex;
         height: var(--composer-height);
         padding: 12px 20px;
-        transition: left 0.3s ease;
         border-top: 1px solid var(--border-light);
         box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
         box-sizing: border-box;
         gap: 12px;
+        z-index: 10;
         
         input[name="message"] {
             flex: 1;
@@ -396,7 +391,9 @@ html, body {
 /* Mobile-first responsive design */
 @media (min-width: 768px) {
     .channels-menu {
-        position: relative;
+        position: fixed;
+        left: 0;
+        top: 0;
         transform: translateX(0);
         transition: none;
     }
@@ -407,12 +404,6 @@ html, body {
     
     .channel .channel-header .menu-toggle {
         display: none;
-    }
-    
-    .channel .channel-header,
-    .channel .channel-messages,
-    .channel .channel-composer {
-        left: var(--sidebar-width);
     }
 }
 

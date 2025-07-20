@@ -18,21 +18,18 @@ export default function Relay(url) {
         socket.addEventListener('open', () => {
             isConnected = true;
             reconnectAttempts = 0;
-            console.log(`Connected to relay: ${url}`);
             
             // Resubscribe to all existing subscriptions
             subscriptionTags.forEach((tag, subId) => {
                 if (tag) {
                     const sub = ["REQ", subId, { kinds: [1], "#t": [tag], limit: 50 }];
                     socket.send(JSON.stringify(sub));
-                    console.log(`Resubscribed to tag: ${tag} with ID: ${subId}`);
                 }
             });
         });
 
         socket.addEventListener('close', (event) => {
             isConnected = false;
-            console.log(`Disconnected from relay: ${url}`);
             
             // Only attempt reconnect if not manually closed
             if (event.code !== 1000 && reconnectAttempts < maxReconnectAttempts) {
@@ -40,8 +37,7 @@ export default function Relay(url) {
             }
         });
 
-        socket.addEventListener('error', (error) => {
-            console.error(`Relay error (${url}):`, error);
+        socket.addEventListener('error', () => {
             isConnected = false;
         });
         
@@ -54,7 +50,7 @@ export default function Relay(url) {
                     if (handler) handler(data[2]);
                 }
             } catch (error) {
-                console.error(`Failed to parse message from ${url}:`, error);
+                // Silently ignore malformed messages
             }
         });
     }
@@ -63,12 +59,9 @@ export default function Relay(url) {
         if (reconnectTimeout) clearTimeout(reconnectTimeout);
         
         reconnectAttempts++;
-        const delay = reconnectDelay * Math.pow(2, reconnectAttempts - 1); // Exponential backoff
-        
-        console.log(`Attempting to reconnect to ${url} in ${delay}ms (attempt ${reconnectAttempts}/${maxReconnectAttempts})`);
+        const delay = reconnectDelay * Math.pow(2, reconnectAttempts - 1);
         
         reconnectTimeout = setTimeout(() => {
-            console.log(`Reconnecting to ${url}...`);
             connect();
         }, delay);
     }
@@ -81,18 +74,14 @@ export default function Relay(url) {
         const sub = ["REQ", subId, { kinds: [1], "#t": [tag], limit: 50 }];
         sendMessage(JSON.stringify(sub));
         subscriptions.set(subId, eventHandler);
-        subscriptionTags.set(subId, tag); // Store the tag for resubscription
-        console.log(`Subscribed to tag: ${tag} with ID: ${subId}`);
+        subscriptionTags.set(subId, tag);
     }
 
     function sendMessage(message) {
-        console.log(message);
         if (socket.readyState === WebSocket.OPEN) {
             socket.send(message);
         } else if (socket.readyState === WebSocket.CONNECTING) {
             socket.addEventListener('open', () => socket.send(message), { once: true });
-        } else {
-            console.error(`Cannot send message to ${url}: connection is closed`);
         }
     }
 

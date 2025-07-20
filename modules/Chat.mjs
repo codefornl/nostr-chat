@@ -43,17 +43,13 @@ export default function Chat(rootEl) {
             <span class="relay-url">${new URL(relay.getURL()).hostname}</span>
         `;
         relayListEl.appendChild(relayItemEl);
-        
         updateRelayStatus(relay, relayItemEl);
-        
-        // Poll status every 2 seconds
         setInterval(() => updateRelayStatus(relay, relayItemEl), 2000);
     }
     
     function updateRelayStatus(relay, relayItemEl) {
         const indicator = relayItemEl.querySelector('.relay-indicator');
         const isConnected = relay.getConnectionStatus();
-        
         indicator.className = `relay-indicator ${isConnected ? 'connected' : 'disconnected'}`;
         indicator.title = isConnected ? 'Connected' : 'Disconnected';
     }
@@ -185,7 +181,6 @@ export default function Chat(rootEl) {
         
         channel.registerRelays(_relays);
         _channels.push(channel);
-        console.log("Channel loaded:", channel.getId());
     }
     
 
