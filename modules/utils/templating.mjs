@@ -84,8 +84,14 @@ export const templates = {
     `,
     
     relayStatus: `
-        <h3>Relays</h3>
-        <div class="relay-list"></div>
+        <div class="relay-header" role="button" tabindex="0" aria-expanded="false" aria-controls="relay-list">
+            <h3>Relays</h3>
+            <div class="relay-indicators-compact">
+                <!-- Compact view - will be populated by JavaScript -->
+            </div>
+            <span class="relay-expand-icon" aria-hidden="true">▼</span>
+        </div>
+        <div class="relay-list" id="relay-list" aria-hidden="true"></div>
     `,
     
     relayItem: `

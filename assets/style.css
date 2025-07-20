@@ -209,25 +209,90 @@ html, body {
 }
 
 .channels-menu .relay-status {
+    padding: 0;
+    border-bottom: 1px solid var(--sidebar-border);
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+}
+
+.channels-menu .relay-status .relay-header {
     padding: 20px;
-    border-bottom: 1px solid #333;
-    background: #2c3e50;
-    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.channels-menu .relay-status .relay-header:hover {
+    background: var(--sidebar-hover);
+}
+
+.channels-menu .relay-status .relay-header:focus {
+    outline: 2px solid var(--codefor-orange);
+    outline-offset: -2px;
 }
 
 .channels-menu .relay-status h3 {
-    margin: 0 0 15px 0;
+    margin: 0;
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-bold);
-    color: #bdc3c7;
+    color: var(--sidebar-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    flex: 1;
+}
+
+.channels-menu .relay-status .relay-indicators-compact {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.channels-menu .relay-status .relay-indicators-compact .relay-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.channels-menu .relay-status .relay-expand-icon {
+    font-size: 12px;
+    color: var(--sidebar-text-muted);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.channels-menu .relay-status .relay-header[aria-expanded="true"] .relay-expand-icon {
+    transform: rotate(180deg);
+}
+
+.channels-menu .relay-status .relay-list {
+    padding: 0 20px 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.channels-menu .relay-status .relay-list[aria-hidden="false"] {
+    max-height: 200px;
+    padding: 20px 20px 15px;
 }
 
 .channels-menu .relay-status .relay-item {
     display: flex;
     align-items: center;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition-delay: 0.1s;
+}
+
+.channels-menu .relay-status .relay-list[aria-hidden="false"] .relay-item {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .channels-menu .relay-status .relay-indicator {

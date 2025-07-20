@@ -25,6 +25,12 @@
             fetch('./config/channels.json')
                 .then(response => response.json())
                 .then(channelsData => chat.loadChannels(channelsData));
+            
+            // Register service worker to prevent PWA-related 404 errors
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .catch(err => console.log('Service worker registration failed:', err));
+            }
         </script>
     </body>
 </html>
