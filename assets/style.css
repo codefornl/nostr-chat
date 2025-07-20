@@ -60,6 +60,50 @@ html, body {
         transform: translateX(0);
     }
     
+    .user-status {
+        padding: 20px;
+        border-bottom: 1px solid var(--border-light);
+        background: var(--primary-orange);
+        color: white;
+        
+        h3 {
+            margin: 0 0 10px 0;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-bold);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
+        }
+        
+        .current-user {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-bold);
+            color: white;
+            margin-bottom: 12px;
+        }
+        
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            
+            &:hover {
+                background: rgba(255, 255, 255, 0.3);
+                border-color: rgba(255, 255, 255, 0.5);
+            }
+            
+            &:active {
+                transform: translateY(1px);
+            }
+        }
+    }
+    
     .relay-status {
         padding: 20px;
         border-bottom: 1px solid var(--border-light);

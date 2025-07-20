@@ -5,6 +5,19 @@ export default function Chat(rootEl) {
     const _channels = [];
     const _relays = [];
     let _currentChannel = null;
+    
+    // Ensure user has a username on startup
+    let username = localStorage.getItem('nostr_username');
+    if (!username) {
+        username = prompt('Wat is je gebruikersnaam voor de chat?');
+        if (username && username.trim()) {
+            username = username.trim();
+            localStorage.setItem('nostr_username', username);
+        } else {
+            username = 'Anoniem';
+            localStorage.setItem('nostr_username', username);
+        }
+    }
 
     fetch('./config/relays.json')
         .then(response => response.json())
@@ -46,6 +59,31 @@ export default function Chat(rootEl) {
 
     const channelsMenuEl = document.createElement('div');
     channelsMenuEl.className = 'channels-menu';
+    
+    const userStatusEl = document.createElement('div');
+    userStatusEl.className = 'user-status';
+    
+    function updateUserStatus() {
+        const currentUsername = localStorage.getItem('nostr_username') || 'Niet ingelogd';
+        userStatusEl.innerHTML = `
+            <h3>Ingelogd als</h3>
+            <div class="current-user">${currentUsername}</div>
+            <button class="logout-btn">Uitloggen</button>
+        `;
+        
+        const logoutBtn = userStatusEl.querySelector('.logout-btn');
+        logoutBtn.addEventListener('click', () => {
+            if (confirm('Weet je zeker dat je wilt uitloggen? Je verliest je chat identiteit.')) {
+                localStorage.removeItem('nostr_username');
+                localStorage.removeItem('nostr_privkey');
+                localStorage.removeItem('nostr_pubkey');
+                location.reload();
+            }
+        });
+    }
+    
+    updateUserStatus();
+    channelsMenuEl.appendChild(userStatusEl);
     
     const relayStatusEl = document.createElement('div');
     relayStatusEl.className = 'relay-status';
