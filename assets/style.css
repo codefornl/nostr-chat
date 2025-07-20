@@ -440,6 +440,21 @@ html, body {
     word-wrap: break-word;
 }
 
+.message-link {
+    color: var(--primary-orange);
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+
+.message-link:hover {
+    color: var(--primary-orange-dark);
+    text-decoration: none;
+}
+
+.message-link:visited {
+    color: #cc5500;
+}
+
 .sidebar-overlay {
     position: fixed;
     top: 0;

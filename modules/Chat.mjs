@@ -243,6 +243,9 @@ export default function Chat(rootEl) {
             _currentChannel.getRootEl().style.display = 'block';
             _currentChannel.setActive(true);
             
+            // Auto-scroll to bottom when switching channels
+            _currentChannel.scrollToBottom();
+            
             // Update menu appearance
             document.querySelectorAll('.channel-menu').forEach(menu => {
                 menu.classList.remove('active');
