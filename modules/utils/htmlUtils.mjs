@@ -68,3 +68,19 @@ export function linkifyText(text) {
     
     return result;
 }
+
+/**
+ * Linkifies hashtags to channel links if the channel exists
+ * @param {string} text - The text containing hashtags
+ * @param {string[]} channelNames - Array of kanaalnamen (id's)
+ * @returns {string} HTML string with clickable channel links
+ */
+export function linkifyChannels(text, channelNames) {
+    // Regex voor hashtags: #kanaalnaam (letters, cijfers, underscores, minimaal 2 tekens)
+    return text.replace(/#([a-zA-Z0-9_\-]{2,})/g, (match, kanaal) => {
+        if (channelNames.includes(kanaal)) {
+            return `<a href="#" class="channel-link" data-channel="${kanaal}">${match}</a>`;
+        }
+        return match;
+    });
+}

@@ -3,6 +3,7 @@ import MessagesViewer from './MessagesViewer.mjs';
 import MessageComposer from './MessageComposer.mjs';
 import { millisecondsToTimestamp } from './utils/nostrUtils.mjs';
 import { STORAGE_KEYS } from './utils/constants.mjs';
+import { renderTemplate, templates } from './utils/templating.mjs';
 
 export default function Channel(options) {
     const _id = options.id || 'unnamed';
@@ -19,21 +20,18 @@ export default function Channel(options) {
     _menuEl.setAttribute('role', 'button');
     _menuEl.setAttribute('tabindex', '0');
     _menuEl.setAttribute('aria-label', `Schakel naar ${_label} kanaal`);
-    _menuEl.innerHTML = `
-        <span class="channel-name">${_label}</span>
-        <span class="unread-counter" style="display: none;" aria-label="ongelezen berichten">0</span>
-    `;
+    _menuEl.innerHTML = renderTemplate(templates.channelMenu, {
+        label: _label
+    });
 
     const _headerEl = document.createElement('div');
     _headerEl.className = 'channel-header';
     _headerEl.setAttribute('role', 'banner');
-    _headerEl.innerHTML = `
-        <button class="menu-toggle" aria-label="Menu openen" aria-expanded="false">☰</button>
-        <h1>${_label}</h1>
-        <div class="header-logo">
-            <img src="https://codefor.nl/img/Logo-orange-01.png" alt="Code for NL" class="logo" />
-        </div>
-    `;
+    _headerEl.innerHTML = renderTemplate(templates.channelHeader, {
+        label: _label,
+        logoUrl: 'https://codefor.nl/img/Logo-orange-01.png',
+        logoAlt: 'Code for NL'
+    });
 
     let _relays = [];
     let _unreadCount = 0;
@@ -126,9 +124,13 @@ export default function Channel(options) {
     
     function setActive(active) {
         _isActive = active;
+        
+        // Update CSS class for visual feedback
         if (active) {
+            _menuEl.classList.add('active');
             markAsRead();
         } else {
+            _menuEl.classList.remove('active');
             // When becoming inactive, recalculate unread count
             recalculateUnreadCount();
         }

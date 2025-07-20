@@ -1,5 +1,7 @@
 import Message from './Message.mjs';
 import { TIMEOUTS, THRESHOLDS } from './utils/constants.mjs';
+import ChannelService from './services/ChannelService.mjs';
+import { debounce, throttle, DOMOptimizer } from './utils/performance.mjs';
 
 export default function MessagesViewer() {
     const _messagesEl = document.createElement('div');
@@ -22,8 +24,8 @@ export default function MessagesViewer() {
     let _isUserScrolling = false;
     let _scrollTimeout = null;
     
-    // Add scroll event listener to detect user scrolling
-    _messagesEl.addEventListener('scroll', () => {
+    // Add throttled scroll event listener for better performance
+    const handleScroll = throttle(() => {
         _isUserScrolling = true;
         
         // Clear existing timeout
@@ -35,7 +37,9 @@ export default function MessagesViewer() {
         _scrollTimeout = setTimeout(() => {
             _isUserScrolling = false;
         }, TIMEOUTS.SCROLL_RESET_DELAY);
-    });
+    }, 16); // ~60fps
+    
+    _messagesEl.addEventListener('scroll', handleScroll);
     
     // Add keyboard navigation for messages (chat-style navigation)
     _messagesEl.addEventListener('keydown', (event) => {
@@ -62,6 +66,16 @@ export default function MessagesViewer() {
         else if (event.key === 'End' && messages.length > 0) {
             event.preventDefault();
             messages[messages.length - 1].focus();
+        }
+    });
+    
+    // Event delegation voor kanaallinks
+    _messagesEl.addEventListener('click', (e) => {
+        const link = e.target.closest('.channel-link');
+        if (link) {
+            e.preventDefault();
+            const kanaal = link.getAttribute('data-channel');
+            ChannelService.switchToChannelById(kanaal);
         }
     });
     
@@ -121,11 +135,12 @@ export default function MessagesViewer() {
         scrollToBottom();
     }
     
-    function scrollToBottom() {
-        requestAnimationFrame(() => {
+    // Optimize scroll to bottom with debouncing
+    const scrollToBottom = debounce(() => {
+        DOMOptimizer.batchWrites([() => {
             _messagesEl.scrollTop = _messagesEl.scrollHeight;
-        });
-    }
+        }]);
+    }, 16);
     
     function isScrolledToBottom() {
         return _messagesEl.scrollHeight - _messagesEl.clientHeight <= _messagesEl.scrollTop + THRESHOLDS.SCROLL_BOTTOM_PIXELS;
