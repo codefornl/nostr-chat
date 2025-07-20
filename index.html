@@ -1,25 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta name="viewport" content="width=320,initial-scale=1" />
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <meta charset="UTF-8">
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#333333" />
-  <title>NOSTR Chat</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <button id="toggleMenu" onclick="document.getElementById('channels').classList.toggle('show')">☰ Menu</button>
-  <div id="channels"></div>
-  <div id="chat">
-    <div id="header">Code for NL <span id="channelName"></span></div>
-    <div id="messages"></div>
-    <div id="input">
-      <input type="text" id="text" placeholder="Schrijf je bericht...">
-      <button onclick="sendMessage()">POST</button>
-    </div>
-  </div>
-  <script type="module" src="app.mjs"></script>
-</body>
+<html lang="nl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Code for NL Chat</title>
+        <link rel="stylesheet" href="/assets/style.css">
+    </head>
+    <body>
+        <div class="chat"></div>
+        <script type="module">
+            import Chat from '/modules/Chat.mjs';
+            const chat = new Chat(document.querySelector('.chat'));
+            fetch('/config/channels.json')
+                .then(response => response.json())
+                .then(channelsData => chat.loadChannels(channelsData));
+        </script>
+    </body>
 </html>

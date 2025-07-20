@@ -2,7 +2,7 @@ body { margin: 0; font-family: sans-serif; display: flex; height: 100vh; flex-di
 #channels { width: 200px; background: #eee; padding: 1rem; overflow-y: auto; }
 #chat { flex: 1; display: flex; flex-direction: column; }
 #header { padding: 1rem; background: #ddd; font-weight: bold; }
-#messages { flex: 1; padding: 1rem; overflow-y: auto; background: #fafafa; }
+#messages-wrapper { flex: 1; padding: 1rem; overflow-y: auto; background: #fafafa; }
 #input { display: flex; border-top: 1px solid #ccc; }
 #input input { flex: 1; padding: 1rem; border: none; font-size: 1rem; }
 #input button { padding: 1rem; border: none; background: #333; color: white; font-size: 1rem; }
