@@ -6,7 +6,7 @@ export default function Chat(rootEl) {
     const _relays = [];
     let _currentChannel = null;
 
-    fetch('/config/relays.json')
+    fetch('./config/relays.json')
         .then(response => response.json())
         .then(relaysConfig => {
             relaysConfig.forEach(relayConfig => registerRelay(new Relay(relayConfig)));
