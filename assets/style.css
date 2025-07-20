@@ -106,14 +106,15 @@ html, body {
     
     .relay-status {
         padding: 20px;
-        border-bottom: 1px solid var(--border-light);
-        background: var(--background-light);
+        border-bottom: 1px solid #333;
+        background: #2c3e50;
+        color: white;
         
         h3 {
             margin: 0 0 15px 0;
             font-size: var(--font-size-sm);
             font-weight: var(--font-weight-bold);
-            color: var(--text-light);
+            color: #bdc3c7;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -143,7 +144,7 @@ html, body {
                 
                 .relay-url {
                     font-size: var(--font-size-sm);
-                    color: var(--text-light);
+                    color: #ecf0f1;
                     font-weight: var(--font-weight-medium);
                 }
             }
@@ -157,6 +158,9 @@ html, body {
         color: var(--text-dark);
         border-bottom: 1px solid var(--border-light);
         transition: all 0.2s ease;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         
         &:hover {
             background: var(--background-light);
@@ -167,6 +171,31 @@ html, body {
             background: var(--primary-orange);
             color: white;
             font-weight: var(--font-weight-bold);
+        }
+        
+        &.has-unread {
+            font-weight: var(--font-weight-bold);
+        }
+        
+        .channel-name {
+            flex: 1;
+        }
+        
+        .unread-counter {
+            background: var(--primary-orange);
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-bold);
+            min-width: 20px;
+            text-align: center;
+            margin-left: 8px;
+        }
+        
+        &.active .unread-counter {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
         }
     }
 }
@@ -198,6 +227,16 @@ html, body {
         border-bottom: 1px solid var(--border-light);
         box-shadow: var(--shadow);
         transition: left 0.3s ease;
+        
+        .header-logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo {
+            height: 32px;
+            width: auto;
+        }
         
         h2 {
             margin: 0;

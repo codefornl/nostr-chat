@@ -19,23 +19,6 @@ export default function Chat(rootEl) {
         }
     }
     
-    // Request notification permission
-    let notificationsEnabled = false;
-    if ('Notification' in window) {
-        if (Notification.permission === 'default') {
-            Notification.requestPermission().then(permission => {
-                notificationsEnabled = permission === 'granted';
-                if (notificationsEnabled) {
-                    console.log('Notifications enabled');
-                } else {
-                    console.log('Notifications denied');
-                }
-            });
-        } else if (Notification.permission === 'granted') {
-            notificationsEnabled = true;
-            console.log('Notifications already enabled');
-        }
-    }
 
     fetch('./config/relays.json')
         .then(response => response.json())
@@ -169,13 +152,29 @@ export default function Chat(rootEl) {
         if (_currentChannel === null) {
             _currentChannel = channel;
             _currentChannel.getRootEl().style.display = 'block';
+            _currentChannel.setActive(true);
         } else {
             channelRootEl.style.display = 'none';
+            channel.setActive(false);
         }
+        
         channelMenuEl.addEventListener('click', () => {
-            _currentChannel.getRootEl().style.display = 'none';
+            // Mark previous channel as inactive
+            if (_currentChannel) {
+                _currentChannel.getRootEl().style.display = 'none';
+                _currentChannel.setActive(false);
+            }
+            
+            // Activate new channel
             _currentChannel = channel;
             _currentChannel.getRootEl().style.display = 'block';
+            _currentChannel.setActive(true);
+            
+            // Update menu appearance
+            document.querySelectorAll('.channel-menu').forEach(menu => {
+                menu.classList.remove('active');
+            });
+            channelMenuEl.classList.add('active');
             
             // Close sidebar on mobile after selecting channel
             if (window.innerWidth < 768) {
@@ -183,57 +182,12 @@ export default function Chat(rootEl) {
             }
         });
         
-        // Set up notification callback for new messages
-        channel.onNewMessage = (event) => {
-            // Only show notification if not on current channel or page is not visible
-            const isCurrentChannel = _currentChannel && _currentChannel.getId() === channel.getId();
-            const isPageVisible = !document.hidden;
-            
-            if (notificationsEnabled && (!isCurrentChannel || !isPageVisible)) {
-                showNotification(event, channelConfig.label);
-            }
-        };
         
         channel.registerRelays(_relays);
         _channels.push(channel);
         console.log("Channel loaded:", channel.getId());
     }
     
-    function showNotification(event, channelName) {
-        // Extract username from event tags
-        let username = 'Anoniem';
-        if (event.tags) {
-            const usernameTag = event.tags.find(tag => tag[0] === 'username');
-            if (usernameTag && usernameTag[1]) {
-                username = usernameTag[1];
-            }
-        }
-        
-        // Don't notify for our own messages
-        const currentUserPubkey = localStorage.getItem('nostr_pubkey');
-        if (event.pubkey === currentUserPubkey) {
-            return;
-        }
-        
-        const notification = new Notification(`${username} in ${channelName}`, {
-            body: event.content,
-            icon: './assets/img/icon-192.png',
-            badge: './assets/img/icon-192.png',
-            tag: 'chat-message',
-            renotify: true,
-            requireInteraction: false,
-            silent: false
-        });
-        
-        // Auto-close after 5 seconds
-        setTimeout(() => notification.close(), 5000);
-        
-        // Focus app when notification is clicked
-        notification.onclick = () => {
-            window.focus();
-            notification.close();
-        };
-    }
 
     return {
         loadChannels,

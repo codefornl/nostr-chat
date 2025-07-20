@@ -12,14 +12,19 @@ export default function Channel(options) {
 
     const _menuEl = document.createElement('div');
     _menuEl.className = 'channel-menu';
-    _menuEl.textContent = _label;
+    _menuEl.innerHTML = `
+        <span class="channel-name">${_label}</span>
+        <span class="unread-counter" style="display: none;">0</span>
+    `;
 
     const _headerEl = document.createElement('div');
     _headerEl.className = 'channel-header';
     _headerEl.innerHTML = `
         <button class="menu-toggle">☰</button>
         <h2>${_label}</h2>
-        <div></div>
+        <div class="header-logo">
+            <img src="https://codefor.nl/img/Logo-orange-01.png" alt="Code for NL" class="logo" />
+        </div>
     `;
     _channelEl.appendChild(_headerEl);
 
@@ -61,7 +66,20 @@ export default function Channel(options) {
 
     const _messages = new Map();
     let _relays = [];
-    let onNewMessage = null; // Callback for new messages
+    let _unreadCount = 0;
+    let _isActive = false;
+    let _onUnreadChange = null;
+    let _lastViewedTime = getLastViewedTime();
+    
+    function getLastViewedTime() {
+        const stored = localStorage.getItem(`channel_last_viewed_${_id}`);
+        return stored ? parseInt(stored) : Math.floor(Date.now() / 1000);
+    }
+    
+    function setLastViewedTime(timestamp) {
+        _lastViewedTime = timestamp || Math.floor(Date.now() / 1000);
+        localStorage.setItem(`channel_last_viewed_${_id}`, _lastViewedTime.toString());
+    }
 
     function registerRelays(relays) {
         relays.forEach(relay => registerRelay(relay));
@@ -74,13 +92,20 @@ export default function Channel(options) {
     }
 
     function eventHandler(event) {
-        const isNewMessage = !_messages.has(event.id);
+        const wasNewMessage = !_messages.has(event.id);
         _messages.set(event.id, event);
         render();
         
-        // Call notification callback for new messages
-        if (isNewMessage && onNewMessage) {
-            onNewMessage(event);
+        // Check if this message is newer than last viewed time
+        const isUnreadMessage = event.created_at > _lastViewedTime;
+        
+        // Increment unread counter for truly new messages when channel is not active
+        if (wasNewMessage && isUnreadMessage && !_isActive) {
+            _unreadCount++;
+            updateUnreadDisplay();
+            if (_onUnreadChange) {
+                _onUnreadChange(_unreadCount);
+            }
         }
     }
 
@@ -88,6 +113,24 @@ export default function Channel(options) {
         _messagesEl.innerHTML = '';
         Array.from(_messages.values()).sort((a, b) => a.created_at - b.created_at).forEach(createMessageEl);
         scrollToBottom();
+        
+        // Recalculate unread count based on last viewed time
+        if (!_isActive) {
+            recalculateUnreadCount();
+        }
+    }
+    
+    function recalculateUnreadCount() {
+        _unreadCount = 0;
+        _messages.forEach(message => {
+            if (message.created_at > _lastViewedTime) {
+                _unreadCount++;
+            }
+        });
+        updateUnreadDisplay();
+        if (_onUnreadChange) {
+            _onUnreadChange(_unreadCount);
+        }
     }
     
     function scrollToBottom() {
@@ -136,6 +179,37 @@ export default function Channel(options) {
         _messagesEl.appendChild(messageEl);
     }
 
+    function updateUnreadDisplay() {
+        const counterEl = _menuEl.querySelector('.unread-counter');
+        if (_unreadCount > 0) {
+            counterEl.textContent = _unreadCount;
+            counterEl.style.display = 'inline-block';
+            _menuEl.classList.add('has-unread');
+        } else {
+            counterEl.style.display = 'none';
+            _menuEl.classList.remove('has-unread');
+        }
+    }
+    
+    function markAsRead() {
+        setLastViewedTime(); // Update to current time
+        _unreadCount = 0;
+        updateUnreadDisplay();
+        if (_onUnreadChange) {
+            _onUnreadChange(_unreadCount);
+        }
+    }
+    
+    function setActive(active) {
+        _isActive = active;
+        if (active) {
+            markAsRead();
+        } else {
+            // When becoming inactive, recalculate unread count
+            recalculateUnreadCount();
+        }
+    }
+    
     function getId() {
         return _id;
     }
@@ -146,6 +220,10 @@ export default function Channel(options) {
 
     function getMenuEl() {
         return _menuEl;
+    }
+    
+    function getUnreadCount() {
+        return _unreadCount;
     }
 
     // Add resize listener for scroll to bottom
@@ -161,8 +239,11 @@ export default function Channel(options) {
         getRootEl,
         getMenuEl,
         scrollToBottom,
-        set onNewMessage(callback) {
-            onNewMessage = callback;
+        markAsRead,
+        setActive,
+        getUnreadCount,
+        set onUnreadChange(callback) {
+            _onUnreadChange = callback;
         }
     }
 }
