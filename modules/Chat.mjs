@@ -188,9 +188,10 @@ export default function Chat(rootEl) {
             channelsContainerEl.classList.add('sidebar-open');
         }
         
-        // Scroll to bottom after sidebar animation completes
+        // Scroll to bottom after sidebar animation completes (only if needed)
         setTimeout(() => {
             if (_currentChannel && _currentChannel.scrollToBottom) {
+                // Only scroll if this is the active channel
                 _currentChannel.scrollToBottom();
             }
         }, 350);

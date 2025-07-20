@@ -1,5 +1,6 @@
-import createNostrEvent from './createNostrEvent.mjs';
-import CodeForNLID from './CodeForNLID.mjs';
+
+import MessagesViewer from './MessagesViewer.mjs';
+import MessageComposer from './MessageComposer.mjs';
 
 export default function Channel(options) {
     const _id = options.id || 'unnamed';
@@ -27,50 +28,19 @@ export default function Channel(options) {
             <img src="https://codefor.nl/img/Logo-orange-01.png" alt="Code for NL" class="logo" />
         </div>
     `;
-    _channelEl.appendChild(_headerEl);
 
-    const _messagesEl = document.createElement('div');
-    _messagesEl.className = 'channel-messages';
-    _channelEl.appendChild(_messagesEl);
-
-    const _messageComposer = document.createElement('div');
-    _messageComposer.className = 'channel-composer';
-    _messageComposer.innerHTML = `
-        <input name="message" type="text" placeholder="Schrijf je bericht hier..." />
-        <button>Post</button>
-    `;
-    _channelEl.appendChild(_messageComposer);
-
-    const _inputEl = _messageComposer.querySelector('input[name="message"]');
-    const _buttonEl = _messageComposer.querySelector('button');
-    
-    async function sendMessage() {
-        const content = _inputEl.value.trim();
-        if (content) {
-            _inputEl.value = '';
-            const event = await createNostrEvent(content, _tag);
-            _relays.forEach(relay => relay.sendMessage(event));
-        }
-    }
-    
-    _buttonEl.addEventListener('click', async (event) => {
-        event.preventDefault();
-        await sendMessage();
-    });
-    
-    _inputEl.addEventListener('keypress', async (event) => {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            await sendMessage();
-        }
-    });
-
-    const _messages = new Map();
     let _relays = [];
     let _unreadCount = 0;
     let _isActive = false;
     let _onUnreadChange = null;
     let _lastViewedTime = getLastViewedTime();
+    
+    const _messagesViewer = new MessagesViewer();
+    const _messageComposer = new MessageComposer(_tag, _relays);
+
+    _channelEl.appendChild(_headerEl);
+    _channelEl.appendChild(_messagesViewer.getElement());
+    _channelEl.appendChild(_messageComposer);
     
     function getLastViewedTime() {
         const stored = localStorage.getItem(`channel_last_viewed_${_id}`);
@@ -92,38 +62,29 @@ export default function Channel(options) {
     }
 
     function eventHandler(event) {
-        const wasNewMessage = !_messages.has(event.id);
-        _messages.set(event.id, event);
-        render();
+        // Delegate message handling to MessagesViewer
+        const wasNewMessage = _messagesViewer.addMessage(event);
         
-        // Check if this message is newer than last viewed time
-        const isUnreadMessage = event.created_at > _lastViewedTime;
-        
-        // Increment unread counter for truly new messages when channel is not active
-        if (wasNewMessage && isUnreadMessage && !_isActive) {
-            _unreadCount++;
-            updateUnreadDisplay();
-            if (_onUnreadChange) {
-                _onUnreadChange(_unreadCount);
+        if (wasNewMessage) {
+            // Check if this message is newer than last viewed time
+            const isUnreadMessage = event.created_at > _lastViewedTime;
+            
+            // Increment unread counter for truly new messages when channel is not active
+            if (isUnreadMessage && !_isActive) {
+                _unreadCount++;
+                updateUnreadDisplay();
+                if (_onUnreadChange) {
+                    _onUnreadChange(_unreadCount);
+                }
             }
-        }
-    }
-
-    function render() {
-        _messagesEl.innerHTML = '';
-        Array.from(_messages.values()).sort((a, b) => a.created_at - b.created_at).forEach(createMessageEl);
-        scrollToBottom();
-        
-        // Recalculate unread count based on last viewed time
-        if (!_isActive) {
-            recalculateUnreadCount();
         }
     }
     
     function recalculateUnreadCount() {
         _unreadCount = 0;
-        _messages.forEach(message => {
-            if (message.created_at > _lastViewedTime) {
+        const messages = _messagesViewer.getMessages();
+        messages.forEach(message => {
+            if (message.getCreatedAt() > _lastViewedTime) {
                 _unreadCount++;
             }
         });
@@ -132,65 +93,7 @@ export default function Channel(options) {
             _onUnreadChange(_unreadCount);
         }
     }
-    
-    function scrollToBottom() {
-        _messagesEl.scrollTop = _messagesEl.scrollHeight;
-    }
 
-    function createMessageEl(event) {
-        const messageEl = document.createElement('div');
-        messageEl.className = 'message';
-        messageEl.setAttribute('data-pubkey', event.pubkey);
-        
-        // Extract username from event tags
-        let username = 'Anoniem';
-        if (event.tags) {
-            const usernameTag = event.tags.find(tag => tag[0] === 'username');
-            if (usernameTag && usernameTag[1]) {
-                username = usernameTag[1];
-            }
-        }
-        
-        // Create avatar
-        const avatarEl = document.createElement('img');
-        avatarEl.className = 'message-avatar';
-        avatarEl.src = CodeForNLID.getAvatarDataURL(event.pubkey, 32);
-        avatarEl.alt = `Avatar voor ${username}`;
-        avatarEl.title = `Avatar voor ${username}`;
-        
-        const headerEl = document.createElement('div');
-        headerEl.className = 'message-header';
-        
-        const usernameEl = document.createElement('span');
-        usernameEl.className = 'message-username';
-        usernameEl.textContent = username;
-        
-        const timeEl = document.createElement('span');
-        timeEl.className = 'message-time';
-        timeEl.textContent = new Date(event.created_at * 1000).toLocaleString('nl-NL', {
-            hour: '2-digit',
-            minute: '2-digit',
-            day: '2-digit',
-            month: '2-digit'
-        });
-        
-        headerEl.appendChild(usernameEl);
-        headerEl.appendChild(timeEl);
-        
-        const messageBodyEl = document.createElement('div');
-        messageBodyEl.className = 'message-body';
-        
-        const contentEl = document.createElement('div');
-        contentEl.className = 'message-content';
-        contentEl.textContent = event.content;
-        
-        messageBodyEl.appendChild(headerEl);
-        messageBodyEl.appendChild(contentEl);
-        
-        messageEl.appendChild(avatarEl);
-        messageEl.appendChild(messageBodyEl);
-        _messagesEl.appendChild(messageEl);
-    }
 
     function updateUnreadDisplay() {
         const counterEl = _menuEl.querySelector('.unread-counter');
@@ -239,19 +142,13 @@ export default function Channel(options) {
         return _unreadCount;
     }
 
-    // Add resize listener for scroll to bottom
-    window.addEventListener('resize', () => {
-        // Small delay to ensure layout has updated
-        setTimeout(scrollToBottom, 100);
-    });
-    
     return {
         registerRelays,
         registerRelay,
         getId,
         getRootEl,
         getMenuEl,
-        scrollToBottom,
+        scrollToBottom: () => _messagesViewer.scrollToBottom(),
         markAsRead,
         setActive,
         getUnreadCount,
