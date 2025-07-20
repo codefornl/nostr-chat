@@ -1,21 +1,27 @@
 {
   "name": "Code for NL Chat",
-  "short_name": "Code for NL",
+  "short_name": "CfNL Chat",
+  "description": "Nostr chat voor de Code for NL community",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#fafafa",
-  "theme_color": "#333333",
-  "orientation": "portrait",
+  "background_color": "#f8f9fa",
+  "theme_color": "#ff6600",
+  "orientation": "portrait-primary",
+  "scope": "./",
+  "lang": "nl",
+  "categories": ["social", "communication"],
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "assets/img/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "assets/img/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
