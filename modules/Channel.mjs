@@ -61,6 +61,7 @@ export default function Channel(options) {
 
     const _messages = new Map();
     let _relays = [];
+    let onNewMessage = null; // Callback for new messages
 
     function registerRelays(relays) {
         relays.forEach(relay => registerRelay(relay));
@@ -73,8 +74,14 @@ export default function Channel(options) {
     }
 
     function eventHandler(event) {
+        const isNewMessage = !_messages.has(event.id);
         _messages.set(event.id, event);
         render();
+        
+        // Call notification callback for new messages
+        if (isNewMessage && onNewMessage) {
+            onNewMessage(event);
+        }
     }
 
     function render() {
@@ -153,6 +160,9 @@ export default function Channel(options) {
         getId,
         getRootEl,
         getMenuEl,
-        scrollToBottom
+        scrollToBottom,
+        set onNewMessage(callback) {
+            onNewMessage = callback;
+        }
     }
 }
