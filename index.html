@@ -4,14 +4,14 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Code for NL Chat</title>
-        <link rel="stylesheet" href="/assets/style.css">
+        <link rel="stylesheet" href="assets/style.css">
     </head>
     <body>
         <div class="chat"></div>
         <script type="module">
-            import Chat from '/modules/Chat.mjs';
+            import Chat from './modules/Chat.mjs';
             const chat = new Chat(document.querySelector('.chat'));
-            fetch('/config/channels.json')
+            fetch('./config/channels.json')
                 .then(response => response.json())
                 .then(channelsData => chat.loadChannels(channelsData));
         </script>

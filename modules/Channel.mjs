@@ -1,4 +1,4 @@
-import createNostrEvent from '/modules/createNostrEvent.mjs';
+import createNostrEvent from './createNostrEvent.mjs';
 
 export default function Channel(options) {
     const _id = options.id || 'unnamed';

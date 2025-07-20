@@ -1,5 +1,5 @@
-import Channel from '/modules/Channel.mjs';
-import Relay from '/modules/Relay.mjs';
+import Channel from './Channel.mjs';
+import Relay from './Relay.mjs';
 
 export default function Chat(rootEl) {
     const _channels = [];
