@@ -42,7 +42,7 @@ export default function ChannelManager(channelsContainerEl, channels, channelsMe
             const menuEl = channel.getMenuEl();
             if (menuEl.parentNode) menuEl.parentNode.removeChild(menuEl);
         });
-        _channels = [];
+        _channels.length = 0; // Clear array without reassigning reference
         _currentChannel = null;
 
         channelsConfig.forEach(channelConfig => {

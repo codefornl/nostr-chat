@@ -22,9 +22,6 @@
         <script type="module">
             import Chat from './modules/Chat.mjs';
             const chat = new Chat(document.querySelector('.chat'));
-            fetch('./config/channels.json')
-                .then(response => response.json())
-                .then(channelsData => chat.loadChannels(channelsData));
             
             // Register service worker to prevent PWA-related 404 errors
             if ('serviceWorker' in navigator) {

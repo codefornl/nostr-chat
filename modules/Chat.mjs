@@ -21,10 +21,8 @@ export default function Chat(rootEl) {
     loadConfigurations(managers);
     setupURLRouting(managers.channelManager);
 
-    return {
-        loadChannels: managers.channelManager.loadChannels.bind(managers.channelManager),
-        loadChannel: managers.channelManager.loadChannel.bind(managers.channelManager)
-    };
+    // Chat is fully self-contained - no external API needed for basic usage
+    return {};
 }
 
 function createUI(rootEl) {
