@@ -7,8 +7,16 @@ export default async function createNostrEvent(content, tag) {
   const pubkey = CodeForNLID.getPublicKey();
   const username = CodeForNLID.getCurrentUsername();
 
+  // For anonymous posting, generate a temporary key pair
+  let actualPrivkey = privkey;
+  let actualPubkey = pubkey;
+  
   if (!privkey || !pubkey) {
-    throw new Error('Geen Code for NL ID gevonden. Log eerst in of maak een nieuw ID aan.');
+    // Generate temporary anonymous key pair
+    const bytes = crypto.getRandomValues(new Uint8Array(32));
+    actualPrivkey = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    const { getPublicKey } = await import('https://esm.sh/nostr-tools');
+    actualPubkey = getPublicKey(actualPrivkey);
   }
 
   const event = {
@@ -16,11 +24,11 @@ export default async function createNostrEvent(content, tag) {
     created_at: Math.floor(Date.now() / 1000),
     tags: [["t", tag], ["username", username]],
     content,
-    pubkey
+    pubkey: actualPubkey
   };
 
   event.id = getEventHash(event);
-  const privkeyBytes = nostrUtils.hexToBytes(privkey);
+  const privkeyBytes = nostrUtils.hexToBytes(actualPrivkey);
   const sig = await schnorr.sign(event.id, privkeyBytes);
   event.sig = nostrUtils.bytesToHex(sig);
 
