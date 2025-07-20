@@ -163,6 +163,17 @@ export default function Chat(rootEl) {
     relayStatusEl.innerHTML = '<h3>Relays</h3><div class="relay-list"></div>';
     channelsMenuEl.appendChild(relayStatusEl);
     
+    // Add OpenDiensten link
+    const openDienstenEl = document.createElement('div');
+    openDienstenEl.className = 'opendiensten-link';
+    openDienstenEl.innerHTML = `
+        <a href="https://www.opendiensten.nl/" target="_blank" rel="noopener noreferrer">
+            <strong>OpenDiensten.nl</strong><br>
+            <small>Videochat, online notes en meer tools</small>
+        </a>
+    `;
+    channelsMenuEl.appendChild(openDienstenEl);
+    
     rootEl.appendChild(channelsMenuEl);
 
     const channelsContainerEl = document.createElement('div');

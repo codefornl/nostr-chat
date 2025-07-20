@@ -455,6 +455,32 @@ html, body {
     color: #cc5500;
 }
 
+.opendiensten-link {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-light);
+    text-align: center;
+}
+
+.opendiensten-link a {
+    color: var(--primary-orange);
+    text-decoration: none;
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-sm);
+    transition: color 0.2s ease;
+    display: block;
+    line-height: 1.4;
+}
+
+.opendiensten-link a small {
+    color: var(--text-light);
+    font-weight: var(--font-weight-normal);
+}
+
+.opendiensten-link a:hover {
+    color: var(--primary-orange-dark);
+    text-decoration: underline;
+}
+
 .sidebar-overlay {
     position: fixed;
     top: 0;
