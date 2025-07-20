@@ -1,21 +1,22 @@
 import KeySteganography from './KeySteganography.mjs';
+import { AVATAR, STORAGE_KEYS, DEFAULTS } from './utils/constants.mjs';
 
 export default class CodeForNLID {
     
     static getCurrentUsername() {
-        return localStorage.getItem('nostr_username') || 'Anoniem';
+        return localStorage.getItem(STORAGE_KEYS.USERNAME) || DEFAULTS.ANONYMOUS_USERNAME;
     }
     
     static getPrivateKey() {
-        return localStorage.getItem('nostr_privkey');
+        return localStorage.getItem(STORAGE_KEYS.PRIVATE_KEY);
     }
     
     static getPublicKey() {
-        return localStorage.getItem('nostr_pubkey');
+        return localStorage.getItem(STORAGE_KEYS.PUBLIC_KEY);
     }
     
     static isLoggedIn() {
-        return this.getCurrentUsername() !== 'Anoniem' && this.getPrivateKey();
+        return this.getCurrentUsername() !== DEFAULTS.ANONYMOUS_USERNAME && this.getPrivateKey();
     }
     
     static async createNewID(username) {
@@ -30,10 +31,10 @@ export default class CodeForNLID {
         const pubkey = getPublicKey(privateKey);
         
         // Store everything and mark as newly created
-        localStorage.setItem('nostr_privkey', privateKey);
-        localStorage.setItem('nostr_pubkey', pubkey);
-        localStorage.setItem('nostr_username', username.trim());
-        localStorage.setItem('nostr_id_source', 'created');
+        localStorage.setItem(STORAGE_KEYS.PRIVATE_KEY, privateKey);
+        localStorage.setItem(STORAGE_KEYS.PUBLIC_KEY, pubkey);
+        localStorage.setItem(STORAGE_KEYS.USERNAME, username.trim());
+        localStorage.setItem(STORAGE_KEYS.ID_SOURCE, 'created');
         
         return { privateKey, pubkey, username: username.trim() };
     }
@@ -86,33 +87,62 @@ export default class CodeForNLID {
         localStorage.setItem('nostr_username', 'Anoniem');
     }
     
-    static generateAvatarFromPubkey(pubkey, size = 64) {
-        // Use pubkey as seed for deterministic avatar generation
+    static generateAvatarFromPubkey(pubkey, size = AVATAR.DEFAULT_SIZE) {
+        const canvas = this._createCanvas(size);
+        const ctx = canvas.getContext('2d');
+        const features = this._extractFeaturesFromPubkey(pubkey);
+        
+        this._drawBackground(ctx, size);
+        this._drawFace(ctx, features.face, size);
+        this._drawHair(ctx, features.hair, size);
+        this._drawEyes(ctx, features.eyes, size);
+        this._drawNose(ctx, features.nose, features.face, size);
+        this._drawMouth(ctx, features.mouth, size);
+        
+        return canvas;
+    }
+    
+    static _createCanvas(size) {
         const canvas = document.createElement('canvas');
         canvas.width = size;
         canvas.height = size;
-        const ctx = canvas.getContext('2d');
-        
-        // Create a simple hash function from pubkey
+        return canvas;
+    }
+    
+    static _extractFeaturesFromPubkey(pubkey) {
         const hash = this._hashPubkey(pubkey);
         
-        // Extract parameters from hash
-        const faceColor = this._getColorFromHash(hash, 0);
-        const eyeColor = this._getColorFromHash(hash, 3);
-        const hairColor = this._getColorFromHash(hash, 6);
-        const eyeSize = (hash[9] % 3) + 2; // 2-4
-        const eyeSpacing = (hash[10] % 20) + 15; // 15-34
-        const mouthWidth = (hash[11] % 20) + 15; // 15-34
-        const noseSize = (hash[12] % 3) + 1; // 1-3
-        const faceShape = hash[13] % 2; // 0=round, 1=square
-        
-        // Draw background
+        return {
+            face: {
+                color: this._getColorFromHash(hash, 0),
+                shape: hash[13] % 2 // 0=round, 1=square
+            },
+            eyes: {
+                color: this._getColorFromHash(hash, 3),
+                size: (hash[9] % 3) + 2, // 2-4
+                spacing: (hash[10] % 20) + 15 // 15-34
+            },
+            hair: {
+                color: this._getColorFromHash(hash, 6)
+            },
+            nose: {
+                size: (hash[12] % 3) + 1 // 1-3
+            },
+            mouth: {
+                width: (hash[11] % 20) + 15 // 15-34
+            }
+        };
+    }
+    
+    static _drawBackground(ctx, size) {
         ctx.fillStyle = '#f0f0f0';
         ctx.fillRect(0, 0, size, size);
+    }
+    
+    static _drawFace(ctx, faceFeatures, size) {
+        ctx.fillStyle = faceFeatures.color;
         
-        // Draw face
-        ctx.fillStyle = faceColor;
-        if (faceShape === 0) {
+        if (faceFeatures.shape === 0) {
             // Round face
             ctx.beginPath();
             ctx.arc(size/2, size/2, size*0.35, 0, 2 * Math.PI);
@@ -122,50 +152,47 @@ export default class CodeForNLID {
             const faceSize = size * 0.7;
             ctx.fillRect((size - faceSize)/2, (size - faceSize)/2, faceSize, faceSize);
         }
-        
-        // Draw hair
-        ctx.fillStyle = hairColor;
+    }
+    
+    static _drawHair(ctx, hairFeatures, size) {
+        ctx.fillStyle = hairFeatures.color;
         ctx.fillRect(size*0.2, size*0.1, size*0.6, size*0.3);
-        
-        // Draw eyes
-        ctx.fillStyle = '#ffffff';
+    }
+    
+    static _drawEyes(ctx, eyeFeatures, size) {
         const eyeY = size * 0.4;
-        const leftEyeX = size/2 - eyeSpacing;
-        const rightEyeX = size/2 + eyeSpacing;
+        const leftEyeX = size/2 - eyeFeatures.spacing;
+        const rightEyeX = size/2 + eyeFeatures.spacing;
         
-        // Left eye
-        ctx.beginPath();
-        ctx.arc(leftEyeX, eyeY, eyeSize * 2, 0, 2 * Math.PI);
-        ctx.fill();
+        // Draw eye whites
+        ctx.fillStyle = '#ffffff';
+        this._drawCircle(ctx, leftEyeX, eyeY, eyeFeatures.size * 2);
+        this._drawCircle(ctx, rightEyeX, eyeY, eyeFeatures.size * 2);
         
-        // Right eye  
-        ctx.beginPath();
-        ctx.arc(rightEyeX, eyeY, eyeSize * 2, 0, 2 * Math.PI);
-        ctx.fill();
-        
-        // Eye pupils
-        ctx.fillStyle = eyeColor;
-        ctx.beginPath();
-        ctx.arc(leftEyeX, eyeY, eyeSize, 0, 2 * Math.PI);
-        ctx.fill();
-        
-        ctx.beginPath();
-        ctx.arc(rightEyeX, eyeY, eyeSize, 0, 2 * Math.PI);
-        ctx.fill();
-        
-        // Draw nose
-        ctx.fillStyle = this._darkenColor(faceColor, 20);
+        // Draw pupils
+        ctx.fillStyle = eyeFeatures.color;
+        this._drawCircle(ctx, leftEyeX, eyeY, eyeFeatures.size);
+        this._drawCircle(ctx, rightEyeX, eyeY, eyeFeatures.size);
+    }
+    
+    static _drawNose(ctx, noseFeatures, faceFeatures, size) {
+        ctx.fillStyle = this._darkenColor(faceFeatures.color, 20);
         const noseY = size * 0.55;
-        ctx.fillRect(size/2 - noseSize, noseY, noseSize * 2, noseSize * 3);
-        
-        // Draw mouth
+        ctx.fillRect(size/2 - noseFeatures.size, noseY, noseFeatures.size * 2, noseFeatures.size * 3);
+    }
+    
+    static _drawMouth(ctx, mouthFeatures, size) {
         ctx.strokeStyle = '#8B4513';
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(size/2, size * 0.7, mouthWidth/2, 0, Math.PI);
+        ctx.arc(size/2, size * 0.7, mouthFeatures.width/2, 0, Math.PI);
         ctx.stroke();
-        
-        return canvas;
+    }
+    
+    static _drawCircle(ctx, x, y, radius) {
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        ctx.fill();
     }
     
     static _hashPubkey(pubkey) {

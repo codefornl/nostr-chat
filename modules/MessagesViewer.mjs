@@ -1,4 +1,5 @@
 import Message from './Message.mjs';
+import { TIMEOUTS, THRESHOLDS } from './utils/constants.mjs';
 
 export default function MessagesViewer() {
     const _messagesEl = document.createElement('div');
@@ -30,10 +31,10 @@ export default function MessagesViewer() {
             clearTimeout(_scrollTimeout);
         }
         
-        // Reset user scrolling flag after 150ms of no scrolling
+        // Reset user scrolling flag after no scrolling
         _scrollTimeout = setTimeout(() => {
             _isUserScrolling = false;
-        }, 150);
+        }, TIMEOUTS.SCROLL_RESET_DELAY);
     });
     
     // Add keyboard navigation for messages (chat-style navigation)
@@ -127,8 +128,7 @@ export default function MessagesViewer() {
     }
     
     function isScrolledToBottom() {
-        const threshold = 50; // pixels
-        return _messagesEl.scrollHeight - _messagesEl.clientHeight <= _messagesEl.scrollTop + threshold;
+        return _messagesEl.scrollHeight - _messagesEl.clientHeight <= _messagesEl.scrollTop + THRESHOLDS.SCROLL_BOTTOM_PIXELS;
     }
     
     function getMessages() {
@@ -151,7 +151,7 @@ export default function MessagesViewer() {
     window.addEventListener('resize', () => {
         // Only scroll to bottom if user was already there
         if (isScrolledToBottom()) {
-            setTimeout(scrollToBottom, 100);
+            setTimeout(scrollToBottom, TIMEOUTS.FOCUS_DELAY);
         }
     });
     

@@ -1,6 +1,8 @@
 
 import MessagesViewer from './MessagesViewer.mjs';
 import MessageComposer from './MessageComposer.mjs';
+import { millisecondsToTimestamp } from './utils/nostrUtils.mjs';
+import { STORAGE_KEYS } from './utils/constants.mjs';
 
 export default function Channel(options) {
     const _id = options.id || 'unnamed';
@@ -47,13 +49,15 @@ export default function Channel(options) {
     _channelEl.appendChild(_messageComposer);
     
     function getLastViewedTime() {
-        const stored = localStorage.getItem(`channel_last_viewed_${_id}`);
-        return stored ? parseInt(stored) : Math.floor(Date.now() / 1000);
+        const storageKey = `${STORAGE_KEYS.CHANNEL_LAST_VIEWED_PREFIX}${_id}`;
+        const stored = localStorage.getItem(storageKey);
+        return stored ? parseInt(stored) : millisecondsToTimestamp();
     }
     
     function setLastViewedTime(timestamp) {
-        _lastViewedTime = timestamp || Math.floor(Date.now() / 1000);
-        localStorage.setItem(`channel_last_viewed_${_id}`, _lastViewedTime.toString());
+        _lastViewedTime = timestamp || millisecondsToTimestamp();
+        const storageKey = `${STORAGE_KEYS.CHANNEL_LAST_VIEWED_PREFIX}${_id}`;
+        localStorage.setItem(storageKey, _lastViewedTime.toString());
     }
 
     function registerRelays(relays) {
