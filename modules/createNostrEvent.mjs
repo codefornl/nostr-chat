@@ -29,7 +29,8 @@ export default async function createNostrEvent(content, tag) {
 
   event.id = getEventHash(event);
   const privkeyBytes = nostrUtils.hexToBytes(actualPrivkey);
-  const sig = await schnorr.sign(event.id, privkeyBytes);
+  const eventIdBytes = nostrUtils.hexToBytes(event.id);
+  const sig = await schnorr.sign(eventIdBytes, privkeyBytes);
   event.sig = nostrUtils.bytesToHex(sig);
 
   return JSON.stringify(["EVENT", event]);
