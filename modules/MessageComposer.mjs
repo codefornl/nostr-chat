@@ -11,12 +11,14 @@ export default function MessageComposer(tag, relays) {
     _messageComposerEl.innerHTML = `
         <label for="${inputId}" class="sr-only">Type je bericht hier</label>
         <input id="${inputId}" name="message" type="text" placeholder="Schrijf je bericht hier..." aria-describedby="${helpId}" />
+        <button type="button" class="video-call-btn" aria-label="Start videogesprek">📹</button>
         <button type="submit" aria-label="Bericht verzenden">Post</button>
         <div id="${helpId}" class="sr-only">Druk op Enter om je bericht te verzenden</div>
     `;
 
     const _inputEl = _messageComposerEl.querySelector('input[name="message"]');
-    const _buttonEl = _messageComposerEl.querySelector('button');
+    const _buttonEl = _messageComposerEl.querySelector('button[type="submit"]');
+    const _videoCallBtn = _messageComposerEl.querySelector('.video-call-btn');
 
     async function sendMessage() {
         const content = _inputEl.value.trim();
@@ -64,6 +66,11 @@ export default function MessageComposer(tag, relays) {
     _buttonEl.addEventListener('click', async (event) => {
         event.preventDefault();
         await sendMessage();
+    });
+    
+    _videoCallBtn.addEventListener('click', (event) => {
+        event.preventDefault();
+        window.open('https://www.opendiensten.nl/start-videogesprek', '_blank');
     });
     
     _inputEl.addEventListener('keypress', async (event) => {
